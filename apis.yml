@@ -1,0 +1,66 @@
+name: Offendersearch
+description: >-
+  A commercial REST API (and private-beta MCP server) for nationwide US sex-offender registry screening, searching 58 US
+  registries through one API with scored matches and per-source provenance.
+url: https://raw.githubusercontent.com/api-evangelist/offendersearch/refs/heads/main/apis.yml
+created: '2026-08-23'
+modified: '2026-08-23'
+specificationVersion: '0.21'
+tags:
+  - Background screening
+  - Identity & risk
+  - Trust & Safety
+  - Public records
+  - Criminal data
+  - Compliance
+  - Sex-offender registry data
+  - Staffing & recruiting
+  - Tenant screening
+  - Healthcare
+  - Gig marketplaces
+apis:
+  - name: Offendersearch API
+    description: >-
+      REST API for national sex-offender screening; API-key authenticated, JSON responses, synchronous and asynchronous
+      search across all 58 US registries.
+    humanURL: https://offendersearch.app/docs
+    baseURL: https://api.offendersearch.app
+    tags:
+      - Background screening
+      - Identity & risk
+      - Trust & Safety
+      - Public records
+      - Criminal data
+      - Compliance
+      - Sex-offender registry data
+      - Staffing & recruiting
+      - Tenant screening
+      - Healthcare
+      - Gig marketplaces
+    properties:
+      - type: OpenAPI
+        url: https://offendersearch.app/openapi.json
+      - type: OpenAPI
+        url: https://offendersearch.app/openapi.yaml
+      - type: Documentation
+        url: https://offendersearch.app/docs
+      - type: Documentation
+        url: https://offendersearch.app/docs/quickstart
+      - type: Documentation
+        url: https://offendersearch.app/docs/authentication
+      - type: Documentation
+        url: https://offendersearch.app/docs.md
+      - type: Documentation
+        url: https://offendersearch.app/docs/all.md
+      - type: Documentation
+        url: https://offendersearch.app/mcp-server
+      - type: Documentation
+        url: https://offendersearch.app/ai-integration
+maintainers:
+  - FN: Offendersearch
+    url: https://offendersearch.app/
+generated:
+  by: apis.io/add
+  model: claude-opus-4-8
+  confidence: 95
+  at: '2026-08-23T02:49:47.318Z'
