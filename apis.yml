@@ -18,6 +18,18 @@ created: '2026-08-23'
 modified: '2026-08-23'
 specificationVersion: '0.21'
 tags:
+  - Background Screening
+  - Identity & risk
+  - Trust and Safety
+  - Public Records
+  - Criminal data
+  - Compliance
+  - Sex-offender registry data
+  - Staffing & recruiting
+  - Tenant Screening
+  - Healthcare
+  - Gig marketplaces
+tags_raw:
   - Background screening
   - Identity & risk
   - Trust & Safety
@@ -37,6 +49,18 @@ apis:
     humanURL: https://offendersearch.app/docs
     baseURL: https://api.offendersearch.app
     tags:
+      - Background Screening
+      - Identity & risk
+      - Trust and Safety
+      - Public Records
+      - Criminal data
+      - Compliance
+      - Sex-offender registry data
+      - Staffing & recruiting
+      - Tenant Screening
+      - Healthcare
+      - Gig marketplaces
+    tags_raw:
       - Background screening
       - Identity & risk
       - Trust & Safety
