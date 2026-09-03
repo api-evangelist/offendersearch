@@ -1,0 +1,23 @@
+generated: '2026-09-03'
+method: searched
+source: https://offendersearch.app/docs/async-and-webhooks.md
+description: >-
+  Webhook catalog for the asynchronous search surface. The provider ships no
+  AsyncAPI document; this captures the documented webhook contract. Supply a
+  webhookUrl on POST /v1/searches and the finished SearchResponse is POSTed to
+  it when the search completes.
+delivery:
+  method: POST to the caller-supplied webhookUrl
+  acknowledgement: Respond 2xx promptly; non-2xx deliveries are retried with exponential backoff for several attempts.
+  semantics: at-least-once — de-duplicate on searchId.
+security:
+  signing_header: X-Offendersearch-Signature
+  scheme: HMAC-SHA256 over the raw request body using the account's signing secret; verify with a timing-safe compare before trusting a delivery.
+events:
+  - name: search.completed
+    description: An asynchronous search finished; payload is the full SearchResponse.
+    payload_fields: [event, searchId, status, counts, sourceStatus, records]
+    example:
+      event: search.completed
+      searchId: srch_9f2a7c
+      status: complete

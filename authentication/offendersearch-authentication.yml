@@ -1,0 +1,59 @@
+generated: '2026-09-03'
+method: searched
+source: openapi/offendersearch-openapi.json + https://offendersearch.app/docs/authentication.md
+summary:
+  types:
+  - apiKey
+  - http
+  api_key_in:
+  - header
+  - query
+schemes:
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: X-API-Key
+  description: Customer API key. Primary auth for search/records/compat/proof.
+  sources:
+  - openapi/offendersearch-openapi.json
+  - openapi/offendersearch-openapi.yaml
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  description: Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted
+    by POST /v1/search and the compat endpoint.
+  sources:
+  - openapi/offendersearch-openapi.json
+  - openapi/offendersearch-openapi.yaml
+- name: QueryKeyAuth
+  type: apiKey
+  in: query
+  parameter: key
+  description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+  sources:
+  - openapi/offendersearch-openapi.json
+  - openapi/offendersearch-openapi.yaml
+- name: AdminAuth
+  type: apiKey
+  in: header
+  parameter: X-Admin-Key
+  description: Internal admin credential — separate from customer API keys.
+  sources:
+  - openapi/offendersearch-openapi.json
+  - openapi/offendersearch-openapi.yaml
+docs: https://offendersearch.app/docs/authentication.md
+key_lifecycle:
+  prefix: os_live_
+  creation: Keys are created, named, rotated and revoked from the dashboard/API keys page; the secret
+    is shown in full only once, at creation, and stored only as a one-way hash.
+  rotation: Issue a second key, deploy it, then revoke the first — both valid at once, so rotation needs
+    no downtime window.
+  scoping: A key is a pure authentication credential — no per-key feature scopes; every key can call every
+    documented endpoint. Usage is attributed per key.
+security_posture:
+  encryption: TLS in transit, AES-256 at rest for stored records and reports
+  tenant_isolation: Data scoped per account; audit logging of account, timestamp and endpoint
+  baa: Business Associate Agreement available to eligible enterprise accounts (HIPAA-ready path)
+  source: https://offendersearch.app/docs/authentication.md
+notes: AdminAuth (X-Admin-Key) is an internal credential, not part of the public API; QueryKeyAuth (?key=)
+  exists only for the offenders.io compat endpoint demo mode.

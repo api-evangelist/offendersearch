@@ -1,0 +1,81 @@
+generated: '2026-09-03'
+method: derived
+source: >-
+  mcp/offendersearch-mcp-tools.json (live tools/list from
+  https://mcp.offendersearch.app/mcp, probed 2026-09-03) bound to
+  openapi/offendersearch-openapi.json (34 paths, fetched from
+  https://offendersearch.app/openapi.json).
+description: >-
+  Binding of each MCP tool to the OpenAPI operation(s) that back it. The MCP
+  tool input schemas use snake_case (first_name) where the REST body uses
+  camelCase (firstName); fields map one-to-one otherwise, so each tool inherits
+  the backing operation's parameters and request body as its real inputSchema.
+surfaces:
+  openapi: openapi/offendersearch-openapi.json
+  mcp:
+    url: https://mcp.offendersearch.app/mcp
+    gated: false-for-discovery
+    note: tools/list is open; tool calls require an X-API-Key and are metered.
+  graphql: none
+crosswalk:
+  - tool: search_offenders
+    category: search
+    rest: [syncSearch]
+    binding: direct
+    confidence: high
+    note: >-
+      Same query surface as POST /v1/search (name, dob, age, city, state,
+      zipcode, address, lat/lng radius, q, jurisdictions, match, freshness,
+      deadline_ms), snake_cased.
+  - tool: batch_search
+    category: search
+    rest: [batchSearch]
+    binding: direct
+    confidence: high
+    note: Up to 1,000 queries per call, matching POST /v1/batch row-in/row-out.
+  - tool: get_registry_coverage
+    category: reference
+    rest: [listSources]
+    binding: direct
+    confidence: high
+    note: GET /v1/sources is public (no key) and returned 200 unauthenticated when probed.
+  - tool: search_criminal
+    category: search
+    rest: [criminalSearch]
+    binding: direct
+    confidence: high
+    note: Fields (lastName, firstName, dob, birthYear, age, state, county, limit) match POST /v1/criminal/search.
+  - tool: get_criminal_coverage
+    category: reference
+    rest: [listCriminalSources]
+    binding: direct
+    confidence: high
+mcp_only: []
+rest_only:
+  - operationId: asyncSearch
+    note: Async submit/collect is REST-only; MCP callers wait on the tool call.
+  - operationId: getSearch
+  - operationId: makeProof
+  - operationId: makeReport
+  - operationId: getProofDoc
+  - operationId: getRecord
+  - operationId: submitSupportMessage
+  - operationId: compatSexoffenderPost
+  - operationId: compatSexoffenderGet
+  - operationId: signup
+  - operationId: login
+  - operationId: getAccount
+  - operationId: listKeys
+  - operationId: createKey
+  - operationId: rotateKey
+  - operationId: deleteKey
+  - operationId: getUsage
+  - operationId: getTeam
+  - operationId: inviteMember
+  - operationId: removeMember
+  - operationId: getBilling
+coverage:
+  mcp_tools: 5
+  bound: 5
+  rest_operations_public: 26
+  rest_operations_bound: 5

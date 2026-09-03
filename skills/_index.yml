@@ -1,0 +1,21 @@
+generated: '2026-09-03'
+method: generated
+source: >-
+  Packaged Agent Skills generated from openapi/offendersearch-openapi.json;
+  every step is grounded in an operationId verified verbatim in the spec, and
+  cross-cutting rules cite conventions/, errors/, authentication/, plans/ and
+  asyncapi/. No provider-published skills or AGENTS.md were found (search
+  2026-09-03).
+skills:
+  - file: offendersearch-screen-a-person.md
+    name: Screen a person against all 58 US sex-offender registries
+    api: openapi/offendersearch-openapi.json
+    operations: [syncSearch, getRecord]
+  - file: offendersearch-bulk-screening.md
+    name: Bulk-screen a roster (async, batch, webhooks)
+    api: openapi/offendersearch-openapi.json
+    operations: [asyncSearch, getSearch, batchSearch]
+  - file: offendersearch-verification-report.md
+    name: Produce a verification report PDF
+    api: openapi/offendersearch-openapi.json
+    operations: [syncSearch, makeReport, getProofDoc]

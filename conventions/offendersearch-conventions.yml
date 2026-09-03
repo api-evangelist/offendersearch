@@ -1,0 +1,108 @@
+generated: '2026-09-03'
+method: searched
+source: >-
+  https://offendersearch.app/docs.md — cross-cutting request/response
+  conventions read from the published docs (authentication, errors,
+  pagination, async-and-webhooks, freshness, result-completeness) and the
+  OpenAPI at https://offendersearch.app/openapi.json.
+description: >-
+  How the Offendersearch API behaves across every operation: X-API-Key
+  authentication, Idempotency-Key on async submission, page-based pagination
+  with a full-result default, deadline-bounded partial results, per-source
+  completeness labelling, rate-limit signaling, and signed webhooks.
+base_url: https://api.offendersearch.app
+api_style: REST over HTTPS, JSON requests and responses
+
+authentication:
+  scheme: X-API-Key request header (secret key, os_live_ prefix)
+  secondary: Bearer session token for account/dashboard endpoints
+  docs: https://offendersearch.app/docs/authentication.md
+  detail: authentication/offendersearch-authentication.yml
+
+idempotency:
+  supported: true
+  mechanism: Idempotency-Key request header
+  applies_to: POST /v1/searches (async submission) — a retry never starts or bills a second search.
+  key_format: Any unique client-generated string (e.g. a UUID)
+  retention: Keys are scoped to the account and "retained long enough to cover normal retry windows" (no exact window published).
+  conflict_behavior: A repeated key returns the original job rather than creating a new one.
+  docs: https://offendersearch.app/docs/async-and-webhooks.md
+
+pagination:
+  style: page-based, opt-in
+  default: Full de-duplicated result set in one response (perPage == counts.records, totalPages == 1)
+  request_params:
+    query.page: '>= 1; 0 returns 422; a page past the end clamps to the last page'
+    query.perPage: '>= 1; default 20 when paginating'
+  response_fields: [page, perPage, totalPages, counts.records, capped]
+  caps: Unpaginated responses cap at 4,000 records and set capped:true; send perPage to reach every record.
+  docs: https://offendersearch.app/docs/pagination.md
+
+deadlines_and_partial_results:
+  mechanism: deadlineMs request bound; onDeadline = partial (default) or error (504)
+  labelling: >-
+    A 200 can be partial — status, counts.sourcesComplete/sourcesQueried and
+    sourceStatus[].incompleteReason (closed enum) label every source, so an
+    incomplete search is never silently empty.
+  docs: https://offendersearch.app/docs/result-completeness.md
+
+field_expansion:
+  supported: false
+metadata:
+  supported: false
+request_tracing:
+  request_id_header: none-published
+
+versioning:
+  scheme: URI path (/v1)
+  current: v1 (spec 1.0.0)
+  detail: lifecycle/offendersearch-lifecycle.yml
+
+error_envelope:
+  media_type: application/json
+  rfc9457: false
+  shape: '{ "error": { "code", "message" } }'
+  detail: errors/offendersearch-problem-types.yml
+  docs: https://offendersearch.app/docs/errors.md
+
+rate_limits:
+  signal_status: 429
+  headers: [X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After]
+  detail: rate-limits/offendersearch-rate-limits.yml
+
+webhooks:
+  signing_header: X-Offendersearch-Signature
+  verification: HMAC-SHA256 over the raw body with the account signing secret
+  semantics: at-least-once; de-duplicate on searchId
+  detail: asyncapi/offendersearch-webhooks.yml
+
+reversibility:
+  summary: >-
+    The product surface is read-only (searches over public-record data): a
+    search mutates nothing in the customer's world, so there is nothing to
+    reverse — but each search is a billable act, and the published protection
+    against paying twice is idempotency, not reversal. No cancel/refund/void
+    operation exists for a submitted search or a generated report.
+  write_surfaces:
+    - surface: Search submission (syncSearch, asyncSearch, batchSearch)
+      side_effect: billable metered call; no data mutation
+      reversal: none
+      grade: na
+      note: >-
+        No cancel operation for a running async search is documented.
+        Idempotency-Key on POST /v1/searches prevents duplicate billing on
+        retries (documented), which is duplicate-prevention, not reversal.
+    - surface: Verification report (makeReport)
+      side_effect: billable PDF generation ($0.02/document)
+      reversal: none
+      grade: na
+    - surface: API key management (createKey, rotateKey, deleteKey)
+      side_effect: credential issuance
+      reversal: deleteKey (DELETE /v1/keys/{keyId}) revokes a key; rotation keeps both keys valid at once so cutover needs no downtime window
+      grade: documented
+      docs: https://offendersearch.app/docs/authentication.md
+  dry_run_mode: na
+  note: >-
+    dry_run and search-level reversibility are honestly na for a read-only
+    screening API; no reversal window is asserted anywhere the docs do not
+    state one.

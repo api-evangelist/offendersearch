@@ -1,0 +1,44 @@
+generated: '2026-09-03'
+method: searched
+source: https://offendersearch.app/pricing
+description: >-
+  Metered per-call pricing with a graduated volume rate and per-request
+  add-ons; no setup fees, per-seat licenses, minimums or contracts. One price
+  covers both the registry and criminal search products.
+plan_count: 4
+plans:
+  - name: Free trial
+    price: 0
+    currency: USD
+    billing: none
+    included: 25 searches against the live national dataset (no card, no sales call)
+    limits:
+      - Trial searches must include a first or last name in the query.
+      - Up to 50 records returned per trial search.
+      - 402 after the 25th search until a payment method is added.
+  - name: Per call
+    price: 0.15
+    currency: USD
+    billing: metered, per API call
+    included: All 58 US registries in one call; continuously-updated data at the base rate; criminal searches billed identically.
+  - name: Volume
+    price: 0.11
+    currency: USD
+    billing: metered, per call beyond 2,000 calls in a calendar month (graduated automatically; first 2,000 at $0.15)
+    note: In a batch, each search counts as one call.
+  - name: Enterprise
+    price: null
+    currency: USD
+    billing: custom
+    included: Custom volume rates below published tiers, net-30/60 terms, signed BAA, team workspaces, priority support.
+    note: Contact sales; price not published.
+addons:
+  - name: Live verification
+    price: 0.02
+    currency: USD
+    unit: per completed live source
+    cap: $2.00 per search; a failed live check is not billed; >2 sources runs asynchronously.
+  - name: Verification report (PDF)
+    price: 0.02
+    currency: USD
+    unit: per document (POST /v1/report, within 7 days of the search)

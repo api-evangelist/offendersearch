@@ -1,0 +1,63 @@
+generated: '2026-09-03'
+method: derived
+source: >-
+  Derived from openapi/offendersearch-openapi.json and the published docs
+  (https://offendersearch.app/docs/errors.md,
+  https://offendersearch.app/docs/async-and-webhooks.md,
+  https://offendersearch.app/docs/pagination.md,
+  https://offendersearch.app/trust); searched the docs for compliance claims.
+standards:
+  - id: idempotency
+    conforms: true
+    evidence: >-
+      Idempotency-Key request header on POST /v1/searches — a repeated key
+      returns the original job instead of creating (and billing) a second
+      search. Documented at /docs/async-and-webhooks.md and declared as a
+      header parameter in the OpenAPI.
+  - id: pagination
+    conforms: true
+    evidence: >-
+      Page-based pagination (query.page, query.perPage, totalPages) documented
+      at /docs/pagination.md; full result set returned in one response by
+      default, with a stated 4,000-record cap flagged via capped:true.
+  - id: rfc9457
+    conforms: false
+    evidence: >-
+      Errors use a custom envelope {"error":{"code","message"}} with a stable
+      error.code (documented at /docs/errors.md), not
+      application/problem+json. The OpenAPI's fallback Error schema is a
+      FastAPI {"detail"} body.
+  - id: oauth2
+    conforms: false
+    evidence: >-
+      No oauth2 securityScheme; auth is an X-API-Key header (plus a bearer
+      session token for dashboard endpoints). No
+      /.well-known/oauth-authorization-server on either host (404 probed
+      2026-09-03).
+  - id: oidc
+    conforms: false
+    evidence: /.well-known/openid-configuration returned 404 on both hosts (probed 2026-09-03).
+  - id: rfc9727-api-catalog
+    conforms: true
+    evidence: >-
+      https://offendersearch.app/.well-known/api-catalog returned 200 with a
+      valid linkset (service-desc, service-doc, service-meta, status,
+      terms-of-service) — saved at well-known/offendersearch-api-catalog.json.
+  - id: rfc8594-sunset
+    conforms: false
+    evidence: No Sunset/Deprecation headers or deprecation policy found in the spec or docs.
+domain_standard:
+  declared: none
+  evidence: >-
+    The contract declares no background-screening domain standard (no FCRA
+    consumer-report interchange shape, no HR-Open/PBSA schema); the provider
+    explicitly states results are "not a consumer report" and not for
+    FCRA-covered decisions (site footer, /trust, llms.txt). Reward-only check:
+    no penalty implied.
+compliance_claims:
+  - claim: HIPAA-ready, BAA available for eligible enterprise accounts
+    source: https://offendersearch.app/trust
+  - claim: TLS in transit, AES-256 at rest, API keys hashed at rest
+    source: https://offendersearch.app/docs/authentication.md
+  - claim: Not a consumer reporting agency; results are not a consumer report (FCRA disclaimer)
+    source: https://offendersearch.app/trust

@@ -1,0 +1,430 @@
+{
+  "tools": [
+    {
+      "name": "search_offenders",
+      "description": "Search US sex-offender registries for one person and/or location.\n\n    Fans out across all 58 registries (or the ones named in `jurisdictions`),\n    de-duplicates people across registries, scores each match, and returns the\n    normalized records. Supply whatever identifiers you have \u2014 all args are\n    optional but at least a name, location, or free-text `q` should be given.\n\n    Returns a SearchResponse object (docs/openapi.yaml / FIELD-DICTIONARY.md):\n      - status: 'complete' | 'partial'  (partial = a source errored, or a source\n        could not be searched to completion)\n      - counts: { records, sourcesQueried, sourcesIncomplete }\n      - warnings: [str] \u2014 ALWAYS present, `[]` when the search ran clean\n      - sourceStatus: [ { source, status, matched, fromCache, note,\n        incomplete, incompleteReason } ]  per-registry outcome\n\n    \u2605 READ `counts.sourcesIncomplete` BEFORE REPORTING A RESULT. Above 0, `records`\n    is a LOWER BOUND: those registries could not be searched to the end, and an\n    empty or short result is NOT evidence that a person is unregistered. Say so.\n    `warnings[0]` states it in plain language; relay it rather than summarising it\n    away.\n      - records: [ Record ], each with:\n          recordId, matchConfidence, matchBasis[],\n          name {first, middle, last, suffix, full}, aliases[], nicknames[],\n          dob, dobPrecision, age, sex, race, ethnicity, height, weight,\n          eyeColor, hairColor, marks, addresses[{type,line1,city,county,state,zipcode,lat,lng}],\n          offense {crime,statute,riskLevel,tier,convictionDate,...}, flags{absconder,predator},\n          source {jurisdiction,registryName,recordUrl,scrapedAt,sourceUpdatedAt}, sources[],\n          dobVerification, unverified\n          (offenses[], stateData, images[] are populated only when extensive=true)\n\n    Auth: uses the caller's X-API-Key (request header or OFFENDERSEARCH_API_KEY env).\n    ",
+      "inputSchema": {
+        "properties": {
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Given name, e.g. 'John'.",
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Surname \u2014 the primary match key, e.g. 'Smith'.",
+            "title": "Last Name"
+          },
+          "dob": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Date of birth 'YYYY-MM-DD'. Improves match precision; drives dobVerification (dob_match / year_match).",
+            "title": "Dob"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "maximum": 130,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Age filter, used when DOB is unknown. Matched +/-1 year for birthday drift.",
+            "title": "Age"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Residence city filter.",
+            "title": "City"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "2-letter state/territory code (e.g. 'IL', 'PR'), or the full name. A residence FILTER \u2014 it does NOT change which registries run; all 58 are still searched. It filters as a UNION: a record is kept when it has an address in that state OR that state's registry is the one holding it. Each record carries `registrationState` and `addressStates` so you can tell which half matched; for the registration half alone, pass `jurisdictions` instead.",
+            "title": "State"
+          },
+          "zipcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Residence ZIP (first 5 digits used).",
+            "title": "Zipcode"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Fuzzy street-address filter (every token must appear in some record address).",
+            "title": "Address"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Latitude for a GIS radius search (pair with lng).",
+            "title": "Lat"
+          },
+          "lng": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Longitude for a GIS radius search (pair with lat).",
+            "title": "Lng"
+          },
+          "radius_miles": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 100,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "GIS radius in miles around lat/lng. Defaults to 1 when a point is given; capped at 100.",
+            "title": "Radius Miles"
+          },
+          "q": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Free-text search across name/alias/address/city/state/zip (all tokens must appear).",
+            "title": "Q"
+          },
+          "jurisdictions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Registry codes to query (e.g. ['IL','TX']). Omit/null = ALL 58 registries. See get_registry_coverage for codes.",
+            "title": "Jurisdictions"
+          },
+          "match": {
+            "default": "balanced",
+            "description": "Fuzzy tolerance: strict=exact; balanced=nicknames/variants/initials/typos on first name, exact last; broad=also prefix/typo on last name.",
+            "enum": [
+              "strict",
+              "balanced",
+              "broad"
+            ],
+            "title": "Match",
+            "type": "string"
+          },
+          "freshness": {
+            "default": "daily",
+            "description": "Cache/pricing tier: daily=<=24h (default), weekly=<=7d.",
+            "enum": [
+              "daily",
+              "weekly"
+            ],
+            "title": "Freshness",
+            "type": "string"
+          },
+          "location_scoped": {
+            "default": false,
+            "description": "OPT-IN ONLY, and never inferred from `state`. If true AND a state is set, run only the registries covering that state instead of all 58. It is a cost knob that COSTS RECALL: anyone registered by another state's registry while residing in the requested state is excluded (7.0% of records). The response reports counts.sourcesSkippedByScope and a NARROWED SEARCH warning when it applies. Leave it false unless the caller explicitly wants the cheaper, narrower search.",
+            "title": "Location Scoped",
+            "type": "boolean"
+          },
+          "extensive": {
+            "default": false,
+            "description": "If true, request extensive detail (retains offenses[], stateData, images). A light call drops them.",
+            "title": "Extensive",
+            "type": "boolean"
+          },
+          "deadline_ms": {
+            "default": 120000,
+            "description": "Max time to wait, in ms (default 120000 / 2 min). Lower for a faster bounded response; partial results return status='partial'.",
+            "exclusiveMinimum": 0,
+            "title": "Deadline Ms",
+            "type": "integer"
+          }
+        },
+        "title": "search_offendersArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "batch_search",
+      "description": "Run many person/location lookups in one call (row-in / row-out).\n\n    Each row goes through the SAME engine as search_offenders, so a row's records\n    are identical to what a single search would return. A row that fails is\n    reported with status='error' in place and never aborts the batch. Max 1000 rows.\n\n    Returns: { count, results: [ { index, status, counts{records,sourcesQueried,\n    sourcesIncomplete}, warnings: [str], records: [Record], error? } ] } in input\n    order. \u2605 A row with `counts.sourcesIncomplete > 0` could not be searched to the\n    end \u2014 its `records` are a LOWER BOUND, not a clean 'no match'.\n\n    Auth: uses the caller's X-API-Key (request header or OFFENDERSEARCH_API_KEY env).\n    ",
+      "inputSchema": {
+        "properties": {
+          "queries": {
+            "description": "List of query objects (max 1000). Each may set any of: firstName, lastName, dob (YYYY-MM-DD), age, city, state, zipcode, address, lat, lng, radiusMiles, q. One row in = one result out, in input order.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Queries",
+            "type": "array"
+          },
+          "jurisdictions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Registry codes applied to EVERY row (e.g. ['FL','TX']). Omit = all 58 registries.",
+            "title": "Jurisdictions"
+          },
+          "match": {
+            "default": "balanced",
+            "description": "Fuzzy tolerance applied to every row (see search_offenders).",
+            "enum": [
+              "strict",
+              "balanced",
+              "broad"
+            ],
+            "title": "Match",
+            "type": "string"
+          },
+          "freshness": {
+            "default": "daily",
+            "description": "Cache/pricing tier applied to every row: daily=<=24h (default), weekly=<=7d.",
+            "enum": [
+              "daily",
+              "weekly"
+            ],
+            "title": "Freshness",
+            "type": "string"
+          },
+          "location_scoped": {
+            "default": false,
+            "description": "Apply per-state scoping to every row (see search_offenders).",
+            "title": "Location Scoped",
+            "type": "boolean"
+          },
+          "extensive": {
+            "default": false,
+            "description": "Request extensive detail (offenses[], stateData, images) for every row.",
+            "title": "Extensive",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "queries"
+        ],
+        "title": "batch_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_registry_coverage",
+      "description": "List every registry we cover plus its scope, legal status, and health.\n\n    Public coverage catalog (no API key required). Use it to discover the\n    `jurisdictions` codes accepted by search_offenders / batch_search and to\n    check per-registry freshness/health before relying on a result.\n\n    Returns: { count, registries: [ SourceInfo ] } where each SourceInfo is:\n      - id: registry code (e.g. 'IL', 'TX', 'PR')\n      - name: human-readable registry name\n      - covers: [state codes] a registry covers ('*' = national / all)\n      - scope: 'state' | 'national'\n      - status: 'live' | 'building'\n      - legal: { commercialUse: 'allowed'|'restricted'|'prohibited'|'unknown' }\n      - health: { lastSuccessAt, typicalLatencyMs, ageSeconds, freshFor }\n\n    `health` is OPERATIONAL COVERAGE METADATA about our ingest schedule, published\n    for transparency. It is NOT a quality warning about a search result: a search\n    serves every registry's best available data regardless of `freshFor`, so a\n    registry listing only 'weekly' still contributes its records to a\n    freshness='daily' search. Do NOT tell a user their search results are stale,\n    unreliable or out of date on the basis of these fields \u2014 they are not. The only\n    completeness signal that belongs in an answer is `counts.sourcesIncomplete` /\n    `warnings[]` from the search response itself.\n    ",
+      "inputSchema": {
+        "properties": {},
+        "title": "get_registry_coverageArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_criminal",
+      "description": "Search US criminal records \u2014 county jail bookings, state prison custody, court cases and warrants.\n\n    Covers county jail rosters, statewide prison systems, court sources, warrant\n    systems and statewide registries across the states, DC and the territories,\n    plus the federal layer \u2014 which is a separate system holding offences no state\n    search will surface.\n\n    A surname is REQUIRED. Supply firstName and a DOB or birth year wherever you\n    have them: a bare common surname returns thousands of people, and the scoring\n    cannot tell you which one is yours.\n\n    Each record carries `recordType`, and YOU MUST READ IT BEFORE CHARACTERISING\n    ANYONE:\n      - a jail booking is an ARREST-stage record \u2014 charges at booking are\n        frequently reduced, dismissed, or never filed. It is NOT a conviction.\n      - prison custody implies a sentence, and therefore a conviction.\n      - a court record carries the DISPOSITION \u2014 the authoritative statement of\n        how a case actually ended.\n      - a warrant means the person is SOUGHT. Nothing has been tested.\n    Never describe someone as convicted on the strength of a booking record.\n\n    Records also carry: name, aliases, dob/birthYear/dobPrecision, sex, race,\n    state, county, custody status and facility, sentence and parole detail,\n    `cases`, `sources` (per-source citation), and `matchConfidence`/`matchBasis`\n    explaining why it matched. `counts.records` is the total found and\n    `counts.recordsReturned` the number in this page.\n\n    Not a consumer report: results must not be used for FCRA-covered decisions\n    (employment, tenancy, credit) without appropriate process.\n    ",
+      "inputSchema": {
+        "properties": {
+          "lastName": {
+            "description": "REQUIRED surname. The criminal corpus refuses an unbounded query \u2014 a name is the field that cannot be enumerated.",
+            "title": "Lastname",
+            "type": "string"
+          },
+          "firstName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Given name. Strongly recommended: a bare common surname returns thousands.",
+            "title": "Firstname"
+          },
+          "dob": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Date of birth, YYYY-MM-DD. The single strongest disambiguator.",
+            "title": "Dob"
+          },
+          "birthYear": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Birth year alone, when a full DOB is unknown.",
+            "title": "Birthyear"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Approximate current age, when neither DOB nor birth year is known.",
+            "title": "Age"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "2-letter state code (e.g. 'TX'). Narrows to that state's jurisdictions.",
+            "title": "State"
+          },
+          "county": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "County name, to narrow within a state.",
+            "title": "County"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "maximum": 200,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Max records to return. Default 50.",
+            "title": "Limit"
+          }
+        },
+        "required": [
+          "lastName"
+        ],
+        "title": "search_criminalArguments",
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_criminal_coverage",
+      "description": "List the criminal-record jurisdictions searched, with kind and status.\n\n    Use it to discover which states and counties are reachable and which are\n    answering today, before relying on an empty result. Depth is uneven by design:\n    counties publish independently, so a state with many county jurisdictions is\n    not \"better covered\" than one that publishes a single statewide source \u2014 it is\n    differently structured.\n\n    Returns the jurisdiction roster; each entry carries its code, the state it\n    belongs to, the kind of records it holds (jail / prison / court / warrant /\n    registry) and whether it is currently answering.\n    ",
+      "inputSchema": {
+        "properties": {},
+        "title": "get_criminal_coverageArguments",
+        "type": "object"
+      }
+    }
+  ]
+}

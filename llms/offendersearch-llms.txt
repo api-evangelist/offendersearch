@@ -1,0 +1,213 @@
+# Offendersearch
+
+> Offendersearch is a REST API over US sex-offender registry data — the 50 states,
+> the District of Columbia, the US territories and NSOPW, normalized into one
+> record schema. One authenticated call searches every jurisdiction and returns
+> scored, de-duplicated records, each carrying per-source provenance and its own
+> lastCheckedAt. Every response reports which sources completed, so an incomplete
+> search is labelled rather than returned as an empty result.
+
+Not a consumer report and not a consumer reporting agency; results must not be the
+sole basis for an FCRA-governed decision. Metered pricing, $0.15 per call.
+
+## Documentation
+
+- [/docs.md](https://offendersearch.app/docs.md): the complete API reference as one markdown document.
+- [/docs/quickstart.md](https://offendersearch.app/docs/quickstart.md): Your first authenticated search in three languages, and the four fields to read off every response.
+- [/docs/authentication.md](https://offendersearch.app/docs/authentication.md): The X-API-Key header, key lifecycle and rotation, and the security posture behind the API.
+- [/docs/errors.md](https://offendersearch.app/docs/errors.md): Every status code, the stable error envelope, the rate-limit headers, and how to back off.
+- [/docs/search.md](https://offendersearch.app/docs/search.md): The primary endpoint. Every parameter, the four stages of a search, and nine worked query shapes.
+- [/docs/matching.md](https://offendersearch.app/docs/matching.md): Match modes, the closed strategy vocabulary, confidence ceilings, and partial-name search.
+- [/docs/date-of-birth.md](https://offendersearch.app/docs/date-of-birth.md): Labelled match strength on every record, and how dob, birthYear and dobPrecision fit together.
+- [/docs/result-completeness.md](https://offendersearch.app/docs/result-completeness.md): An incomplete search is labelled, never silently empty. counts, sourceStatus and incompleteReason.
+- [/docs/pagination.md](https://offendersearch.app/docs/pagination.md): The full result set in one response by default — plus page, perPage and totalPages when you want slices.
+- [/docs/freshness.md](https://offendersearch.app/docs/freshness.md): Two modes — Regular (continuously updated) and Live — per-record lastCheckedAt, and the live coverage catalog.
+- [/docs/jurisdictions.md](https://offendersearch.app/docs/jurisdictions.md): Every jurisdiction code, and the difference between scoping a search and filtering a result.
+- [/docs/async-and-webhooks.md](https://offendersearch.app/docs/async-and-webhooks.md): Submit and collect, with no request-timeout ceiling. Signed webhooks and idempotent retries.
+- [/docs/batch.md](https://offendersearch.app/docs/batch.md): Up to 1000 lookups per call, JSON or CSV, row in and row out, with per-row fault isolation.
+- [/docs/record-object.md](https://offendersearch.app/docs/record-object.md): One normalized 76-field schema across every jurisdiction, and how to read its empty values.
+- [/docs/reports.md](https://offendersearch.app/docs/reports.md): A timestamped PDF of a search you already ran, with a source citation on every record.
+- [/docs/migration.md](https://offendersearch.app/docs/migration.md): A drop-in compatibility endpoint, the full legacy parameter map, and what /v1/search adds.
+
+## Machine-readable definitions
+
+- [/openapi.yaml](https://offendersearch.app/openapi.yaml): OpenAPI 3.1 definition of the v1.0.0 API (YAML).
+- [/openapi.json](https://offendersearch.app/openapi.json): OpenAPI 3.1 definition of the v1.0.0 API (JSON).
+- [/.well-known/api-catalog](https://offendersearch.app/.well-known/api-catalog): RFC 9727 linkset naming every API this origin publishes.
+
+## Product and coverage
+
+- [/coverage](https://offendersearch.app/coverage): Every jurisdiction covered, and what one nationwide call returns.
+- [/registered-offender-database](https://offendersearch.app/registered-offender-database): What is in the dataset: schema, cohorts, freshness.
+- [/pricing](https://offendersearch.app/pricing): Per-call pricing, volume tiers and surcharges.
+- [/mcp-server](https://offendersearch.app/mcp-server): Model Context Protocol server for agent clients.
+- [/ai-integration](https://offendersearch.app/ai-integration): Tool-call definitions for integrating the API into an LLM agent.
+
+## Statistics and reference data
+
+- [/sex-offender-statistics](https://offendersearch.app/sex-offender-statistics): National statistics: about 1,560,000 sex-offender registry records indexed across all 58 US registries, per-state ranked counts, per-1,000-resident rates, and housing-status estimates. Dated and citable.
+- [/sex-offender-registry](https://offendersearch.app/sex-offender-registry): Index of per-jurisdiction registry guides for all 56 US jurisdictions.
+- [/sex-offender-registry/alabama](https://offendersearch.app/sex-offender-registry/alabama): Alabama: about 13,000 registry records indexed. Guide to searching the AL registry.
+- [/sex-offender-registry/alaska](https://offendersearch.app/sex-offender-registry/alaska): Alaska: about 3,750 registry records indexed. Guide to searching the AK registry.
+- [/sex-offender-registry/arizona](https://offendersearch.app/sex-offender-registry/arizona): Arizona: about 13,200 registry records indexed. Guide to searching the AZ registry.
+- [/sex-offender-registry/arkansas](https://offendersearch.app/sex-offender-registry/arkansas): Arkansas: about 11,200 registry records indexed. Guide to searching the AR registry.
+- [/sex-offender-registry/california](https://offendersearch.app/sex-offender-registry/california): California: about 62,900 registry records indexed. Guide to searching the CA registry.
+- [/sex-offender-registry/colorado](https://offendersearch.app/sex-offender-registry/colorado): Colorado: about 12,900 registry records indexed. Guide to searching the CO registry.
+- [/sex-offender-registry/connecticut](https://offendersearch.app/sex-offender-registry/connecticut): Connecticut: about 5,880 registry records indexed. Guide to searching the CT registry.
+- [/sex-offender-registry/delaware](https://offendersearch.app/sex-offender-registry/delaware): Delaware: about 4,030 registry records indexed. Guide to searching the DE registry.
+- [/sex-offender-registry/district-of-columbia](https://offendersearch.app/sex-offender-registry/district-of-columbia): District of Columbia: about 1,060 registry records indexed. Guide to searching the DC registry.
+- [/sex-offender-registry/florida](https://offendersearch.app/sex-offender-registry/florida): Florida: about 92,900 registry records indexed. Guide to searching the FL registry.
+- [/sex-offender-registry/georgia](https://offendersearch.app/sex-offender-registry/georgia): Georgia: about 41,500 registry records indexed. Guide to searching the GA registry.
+- [/sex-offender-registry/hawaii](https://offendersearch.app/sex-offender-registry/hawaii): Hawaii: about 2,930 registry records indexed. Guide to searching the HI registry.
+- [/sex-offender-registry/idaho](https://offendersearch.app/sex-offender-registry/idaho): Idaho: about 5,360 registry records indexed. Guide to searching the ID registry.
+- [/sex-offender-registry/illinois](https://offendersearch.app/sex-offender-registry/illinois): Illinois: about 44,300 registry records indexed. Guide to searching the IL registry.
+- [/sex-offender-registry/indiana](https://offendersearch.app/sex-offender-registry/indiana): Indiana: about 14,600 registry records indexed. Guide to searching the IN registry.
+- [/sex-offender-registry/iowa](https://offendersearch.app/sex-offender-registry/iowa): Iowa: about 7,170 registry records indexed. Guide to searching the IA registry.
+- [/sex-offender-registry/kansas](https://offendersearch.app/sex-offender-registry/kansas): Kansas: about 11,500 registry records indexed. Guide to searching the KS registry.
+- [/sex-offender-registry/kentucky](https://offendersearch.app/sex-offender-registry/kentucky): Kentucky: about 11,000 registry records indexed. Guide to searching the KY registry.
+- [/sex-offender-registry/louisiana](https://offendersearch.app/sex-offender-registry/louisiana): Louisiana: about 13,500 registry records indexed. Guide to searching the LA registry.
+- [/sex-offender-registry/maine](https://offendersearch.app/sex-offender-registry/maine): Maine: about 2,890 registry records indexed. Guide to searching the ME registry.
+- [/sex-offender-registry/maryland](https://offendersearch.app/sex-offender-registry/maryland): Maryland: about 7,490 registry records indexed. Guide to searching the MD registry.
+- [/sex-offender-registry/massachusetts](https://offendersearch.app/sex-offender-registry/massachusetts): Massachusetts: about 4,180 registry records indexed. Guide to searching the MA registry.
+- [/sex-offender-registry/michigan](https://offendersearch.app/sex-offender-registry/michigan): Michigan: about 43,300 registry records indexed. Guide to searching the MI registry.
+- [/sex-offender-registry/minnesota](https://offendersearch.app/sex-offender-registry/minnesota): Minnesota: about 1,480 registry records indexed. Guide to searching the MN registry.
+- [/sex-offender-registry/mississippi](https://offendersearch.app/sex-offender-registry/mississippi): Mississippi: about 14,200 registry records indexed. Guide to searching the MS registry.
+- [/sex-offender-registry/missouri](https://offendersearch.app/sex-offender-registry/missouri): Missouri: about 21,500 registry records indexed. Guide to searching the MO registry.
+- [/sex-offender-registry/montana](https://offendersearch.app/sex-offender-registry/montana): Montana: about 6,730 registry records indexed. Guide to searching the MT registry.
+- [/sex-offender-registry/nebraska](https://offendersearch.app/sex-offender-registry/nebraska): Nebraska: about 7,240 registry records indexed. Guide to searching the NE registry.
+- [/sex-offender-registry/nevada](https://offendersearch.app/sex-offender-registry/nevada): Nevada: about 9,900 registry records indexed. Guide to searching the NV registry.
+- [/sex-offender-registry/new-hampshire](https://offendersearch.app/sex-offender-registry/new-hampshire): New Hampshire: about 2,690 registry records indexed. Guide to searching the NH registry.
+- [/sex-offender-registry/new-jersey](https://offendersearch.app/sex-offender-registry/new-jersey): New Jersey: about 4,540 registry records indexed. Guide to searching the NJ registry.
+- [/sex-offender-registry/new-mexico](https://offendersearch.app/sex-offender-registry/new-mexico): New Mexico: about 2,840 registry records indexed. Guide to searching the NM registry.
+- [/sex-offender-registry/new-york](https://offendersearch.app/sex-offender-registry/new-york): New York: about 28,300 registry records indexed. Guide to searching the NY registry.
+- [/sex-offender-registry/north-carolina](https://offendersearch.app/sex-offender-registry/north-carolina): North Carolina: about 31,100 registry records indexed. Guide to searching the NC registry.
+- [/sex-offender-registry/north-dakota](https://offendersearch.app/sex-offender-registry/north-dakota): North Dakota: about 2,250 registry records indexed. Guide to searching the ND registry.
+- [/sex-offender-registry/ohio](https://offendersearch.app/sex-offender-registry/ohio): Ohio: about 21,700 registry records indexed. Guide to searching the OH registry.
+- [/sex-offender-registry/oklahoma](https://offendersearch.app/sex-offender-registry/oklahoma): Oklahoma: about 8,380 registry records indexed. Guide to searching the OK registry.
+- [/sex-offender-registry/oregon](https://offendersearch.app/sex-offender-registry/oregon): Oregon: about 2,010 registry records indexed. Guide to searching the OR registry.
+- [/sex-offender-registry/pennsylvania](https://offendersearch.app/sex-offender-registry/pennsylvania): Pennsylvania: about 25,400 registry records indexed. Guide to searching the PA registry.
+- [/sex-offender-registry/rhode-island](https://offendersearch.app/sex-offender-registry/rhode-island): Rhode Island: about 1,550 registry records indexed. Guide to searching the RI registry.
+- [/sex-offender-registry/south-carolina](https://offendersearch.app/sex-offender-registry/south-carolina): South Carolina: about 18,200 registry records indexed. Guide to searching the SC registry.
+- [/sex-offender-registry/south-dakota](https://offendersearch.app/sex-offender-registry/south-dakota): South Dakota: about 4,140 registry records indexed. Guide to searching the SD registry.
+- [/sex-offender-registry/tennessee](https://offendersearch.app/sex-offender-registry/tennessee): Tennessee: about 27,900 registry records indexed. Guide to searching the TN registry.
+- [/sex-offender-registry/texas](https://offendersearch.app/sex-offender-registry/texas): Texas: about 108,000 registry records indexed. Guide to searching the TX registry.
+- [/sex-offender-registry/utah](https://offendersearch.app/sex-offender-registry/utah): Utah: about 12,200 registry records indexed. Guide to searching the UT registry.
+- [/sex-offender-registry/vermont](https://offendersearch.app/sex-offender-registry/vermont): Vermont: about 1,310 registry records indexed. Guide to searching the VT registry.
+- [/sex-offender-registry/virginia](https://offendersearch.app/sex-offender-registry/virginia): Virginia: about 31,900 registry records indexed. Guide to searching the VA registry.
+- [/sex-offender-registry/washington](https://offendersearch.app/sex-offender-registry/washington): Washington: about 6,380 registry records indexed. Guide to searching the WA registry.
+- [/sex-offender-registry/west-virginia](https://offendersearch.app/sex-offender-registry/west-virginia): West Virginia: about 5,450 registry records indexed. Guide to searching the WV registry.
+- [/sex-offender-registry/wisconsin](https://offendersearch.app/sex-offender-registry/wisconsin): Wisconsin: about 27,400 registry records indexed. Guide to searching the WI registry.
+- [/sex-offender-registry/wyoming](https://offendersearch.app/sex-offender-registry/wyoming): Wyoming: about 2,620 registry records indexed. Guide to searching the WY registry.
+- [/sex-offender-registry/puerto-rico](https://offendersearch.app/sex-offender-registry/puerto-rico): Puerto Rico: about 2,950 registry records indexed. Guide to searching the PR registry.
+- [/sex-offender-registry/guam](https://offendersearch.app/sex-offender-registry/guam): Guam: about 857 registry records indexed. Guide to searching the GU registry.
+- [/sex-offender-registry/us-virgin-islands](https://offendersearch.app/sex-offender-registry/us-virgin-islands): US Virgin Islands: about 140 registry records indexed. Guide to searching the USVI registry.
+- [/sex-offender-registry/american-samoa](https://offendersearch.app/sex-offender-registry/american-samoa): American Samoa: about 147 registry records indexed. Guide to searching the AS registry.
+- [/sex-offender-registry/northern-mariana-islands](https://offendersearch.app/sex-offender-registry/northern-mariana-islands): Northern Mariana Islands: about 109 registry records indexed. Guide to searching the CNMI registry.
+- [/sex-offenders/chicago-il](https://offendersearch.app/sex-offenders/chicago-il): Chicago, IL: about 9,050 registrants indexed with a Chicago address.
+- [/sex-offenders/houston-tx](https://offendersearch.app/sex-offenders/houston-tx): Houston, TX: about 8,751 registrants indexed with a Houston address.
+- [/sex-offenders/las-vegas-nv](https://offendersearch.app/sex-offenders/las-vegas-nv): Las Vegas, NV: about 7,585 registrants indexed with a Las Vegas address.
+- [/sex-offenders/phoenix-az](https://offendersearch.app/sex-offenders/phoenix-az): Phoenix, AZ: about 4,926 registrants indexed with a Phoenix address.
+- [/sex-offenders/dallas-tx](https://offendersearch.app/sex-offenders/dallas-tx): Dallas, TX: about 4,809 registrants indexed with a Dallas address.
+- [/sex-offenders/los-angeles-ca](https://offendersearch.app/sex-offenders/los-angeles-ca): Los Angeles, CA: about 4,684 registrants indexed with a Los Angeles address.
+- [/sex-offenders/philadelphia-pa](https://offendersearch.app/sex-offenders/philadelphia-pa): Philadelphia, PA: about 4,269 registrants indexed with a Philadelphia address.
+- [/sex-offenders/san-antonio-tx](https://offendersearch.app/sex-offenders/san-antonio-tx): San Antonio, TX: about 4,140 registrants indexed with a San Antonio address.
+- [/sex-offenders/detroit-mi](https://offendersearch.app/sex-offenders/detroit-mi): Detroit, MI: about 3,841 registrants indexed with a Detroit address.
+- [/sex-offenders/fort-worth-tx](https://offendersearch.app/sex-offenders/fort-worth-tx): Fort Worth, TX: about 3,312 registrants indexed with a Fort Worth address.
+- [/sex-offenders/memphis-tn](https://offendersearch.app/sex-offenders/memphis-tn): Memphis, TN: about 3,196 registrants indexed with a Memphis address.
+- [/sex-offenders/indianapolis-in](https://offendersearch.app/sex-offenders/indianapolis-in): Indianapolis, IN: about 3,041 registrants indexed with a Indianapolis address.
+- [/sex-offenders/orlando-fl](https://offendersearch.app/sex-offenders/orlando-fl): Orlando, FL: about 2,990 registrants indexed with a Orlando address.
+- [/sex-offenders/jacksonville-fl](https://offendersearch.app/sex-offenders/jacksonville-fl): Jacksonville, FL: about 2,956 registrants indexed with a Jacksonville address.
+- [/sex-offenders/st-louis-mo](https://offendersearch.app/sex-offenders/st-louis-mo): St. Louis, MO: about 2,806 registrants indexed with a St. Louis address.
+- [/sex-offenders/milwaukee-wi](https://offendersearch.app/sex-offenders/milwaukee-wi): Milwaukee, WI: about 2,761 registrants indexed with a Milwaukee address.
+- [/sex-offenders/cleveland-oh](https://offendersearch.app/sex-offenders/cleveland-oh): Cleveland, OH: about 2,610 registrants indexed with a Cleveland address.
+- [/sex-offenders/raleigh-nc](https://offendersearch.app/sex-offenders/raleigh-nc): Raleigh, NC: about 2,522 registrants indexed with a Raleigh address.
+- [/sex-offenders/sacramento-ca](https://offendersearch.app/sex-offenders/sacramento-ca): Sacramento, CA: about 2,449 registrants indexed with a Sacramento address.
+- [/sex-offenders/kansas-city-mo](https://offendersearch.app/sex-offenders/kansas-city-mo): Kansas City, MO: about 2,431 registrants indexed with a Kansas City address.
+- [/sex-offenders/atlanta-ga](https://offendersearch.app/sex-offenders/atlanta-ga): Atlanta, GA: about 2,406 registrants indexed with a Atlanta address.
+- [/sex-offenders/lincoln-ne](https://offendersearch.app/sex-offenders/lincoln-ne): Lincoln, NE: about 2,399 registrants indexed with a Lincoln address.
+- [/sex-offenders/denver-co](https://offendersearch.app/sex-offenders/denver-co): Denver, CO: about 2,302 registrants indexed with a Denver address.
+- [/sex-offenders/nashville-tn](https://offendersearch.app/sex-offenders/nashville-tn): Nashville, TN: about 2,242 registrants indexed with a Nashville address.
+- [/sex-offenders/tucson-az](https://offendersearch.app/sex-offenders/tucson-az): Tucson, AZ: about 2,213 registrants indexed with a Tucson address.
+- [/sex-offenders/baltimore-md](https://offendersearch.app/sex-offenders/baltimore-md): Baltimore, MD: about 2,161 registrants indexed with a Baltimore address.
+- [/sex-offenders/columbus-oh](https://offendersearch.app/sex-offenders/columbus-oh): Columbus, OH: about 2,085 registrants indexed with a Columbus address.
+- [/sex-offenders/grand-rapids-mi](https://offendersearch.app/sex-offenders/grand-rapids-mi): Grand Rapids, MI: about 1,912 registrants indexed with a Grand Rapids address.
+- [/sex-offenders/louisville-ky](https://offendersearch.app/sex-offenders/louisville-ky): Louisville, KY: about 1,886 registrants indexed with a Louisville address.
+- [/sex-offenders/colorado-springs-co](https://offendersearch.app/sex-offenders/colorado-springs-co): Colorado Springs, CO: about 1,875 registrants indexed with a Colorado Springs address.
+- [/sex-offenders/san-jose-ca](https://offendersearch.app/sex-offenders/san-jose-ca): San Jose, CA: about 1,862 registrants indexed with a San Jose address.
+- [/sex-offenders/oklahoma-city-ok](https://offendersearch.app/sex-offenders/oklahoma-city-ok): Oklahoma City, OK: about 1,860 registrants indexed with a Oklahoma City address.
+- [/sex-offenders/omaha-ne](https://offendersearch.app/sex-offenders/omaha-ne): Omaha, NE: about 1,829 registrants indexed with a Omaha address.
+- [/sex-offenders/wichita-ks](https://offendersearch.app/sex-offenders/wichita-ks): Wichita, KS: about 1,760 registrants indexed with a Wichita address.
+- [/sex-offenders/reno-nv](https://offendersearch.app/sex-offenders/reno-nv): Reno, NV: about 1,741 registrants indexed with a Reno address.
+- [/sex-offenders/miami-fl](https://offendersearch.app/sex-offenders/miami-fl): Miami, FL: about 1,708 registrants indexed with a Miami address.
+- [/sex-offenders/minneapolis-mn](https://offendersearch.app/sex-offenders/minneapolis-mn): Minneapolis, MN: about 1,680 registrants indexed with a Minneapolis address.
+- [/sex-offenders/norfolk-va](https://offendersearch.app/sex-offenders/norfolk-va): Norfolk, VA: about 1,656 registrants indexed with a Norfolk address.
+- [/sex-offenders/austin-tx](https://offendersearch.app/sex-offenders/austin-tx): Austin, TX: about 1,604 registrants indexed with a Austin address.
+- [/sex-offenders/anchorage-ak](https://offendersearch.app/sex-offenders/anchorage-ak): Anchorage, AK: about 1,582 registrants indexed with a Anchorage address.
+- [/sex-offenders/tampa-fl](https://offendersearch.app/sex-offenders/tampa-fl): Tampa, FL: about 1,569 registrants indexed with a Tampa address.
+- [/sex-offenders/el-paso-tx](https://offendersearch.app/sex-offenders/el-paso-tx): El Paso, TX: about 1,501 registrants indexed with a El Paso address.
+- [/sex-offenders/cincinnati-oh](https://offendersearch.app/sex-offenders/cincinnati-oh): Cincinnati, OH: about 1,477 registrants indexed with a Cincinnati address.
+- [/sex-offenders/fresno-ca](https://offendersearch.app/sex-offenders/fresno-ca): Fresno, CA: about 1,466 registrants indexed with a Fresno address.
+- [/sex-offenders/san-diego-ca](https://offendersearch.app/sex-offenders/san-diego-ca): San Diego, CA: about 1,461 registrants indexed with a San Diego address.
+- [/sex-offenders/sioux-falls-sd](https://offendersearch.app/sex-offenders/sioux-falls-sd): Sioux Falls, SD: about 1,409 registrants indexed with a Sioux Falls address.
+- [/sex-offenders/charlotte-nc](https://offendersearch.app/sex-offenders/charlotte-nc): Charlotte, NC: about 1,402 registrants indexed with a Charlotte address.
+- [/sex-offenders/virginia-beach-va](https://offendersearch.app/sex-offenders/virginia-beach-va): Virginia Beach, VA: about 1,397 registrants indexed with a Virginia Beach address.
+- [/sex-offenders/little-rock-ar](https://offendersearch.app/sex-offenders/little-rock-ar): Little Rock, AR: about 1,344 registrants indexed with a Little Rock address.
+- [/sex-offenders/newport-news-va](https://offendersearch.app/sex-offenders/newport-news-va): Newport News, VA: about 1,327 registrants indexed with a Newport News address.
+- [/sex-offenders/pittsburgh-pa](https://offendersearch.app/sex-offenders/pittsburgh-pa): Pittsburgh, PA: about 1,324 registrants indexed with a Pittsburgh address.
+- [/sex-offenders/baton-rouge-la](https://offendersearch.app/sex-offenders/baton-rouge-la): Baton Rouge, LA: about 1,293 registrants indexed with a Baton Rouge address.
+- [/sex-offenders/dayton-oh](https://offendersearch.app/sex-offenders/dayton-oh): Dayton, OH: about 1,284 registrants indexed with a Dayton address.
+- [/sex-offenders/akron-oh](https://offendersearch.app/sex-offenders/akron-oh): Akron, OH: about 1,263 registrants indexed with a Akron address.
+- [/sex-offenders/rockford-il](https://offendersearch.app/sex-offenders/rockford-il): Rockford, IL: about 1,255 registrants indexed with a Rockford address.
+- [/sex-offenders/chesapeake-va](https://offendersearch.app/sex-offenders/chesapeake-va): Chesapeake, VA: about 1,242 registrants indexed with a Chesapeake address.
+- [/sex-offenders/albuquerque-nm](https://offendersearch.app/sex-offenders/albuquerque-nm): Albuquerque, NM: about 1,236 registrants indexed with a Albuquerque address.
+- [/sex-offenders/washington-dc](https://offendersearch.app/sex-offenders/washington-dc): Washington, DC: about 1,233 registrants indexed with a Washington address.
+- [/sex-offenders/rochester-ny](https://offendersearch.app/sex-offenders/rochester-ny): Rochester, NY: about 1,230 registrants indexed with a Rochester address.
+- [/sex-offenders/corpus-christi-tx](https://offendersearch.app/sex-offenders/corpus-christi-tx): Corpus Christi, TX: about 1,217 registrants indexed with a Corpus Christi address.
+- [/sex-offenders/peoria-il](https://offendersearch.app/sex-offenders/peoria-il): Peoria, IL: about 1,175 registrants indexed with a Peoria address.
+- [/sex-offenders/bakersfield-ca](https://offendersearch.app/sex-offenders/bakersfield-ca): Bakersfield, CA: about 1,164 registrants indexed with a Bakersfield address.
+- [/sex-offenders/aurora-co](https://offendersearch.app/sex-offenders/aurora-co): Aurora, CO: about 1,162 registrants indexed with a Aurora address.
+- [/sex-offenders/springfield-mo](https://offendersearch.app/sex-offenders/springfield-mo): Springfield, MO: about 1,133 registrants indexed with a Springfield address.
+- [/sex-offenders/mesa-az](https://offendersearch.app/sex-offenders/mesa-az): Mesa, AZ: about 1,130 registrants indexed with a Mesa address.
+- [/sex-offenders/new-orleans-la](https://offendersearch.app/sex-offenders/new-orleans-la): New Orleans, LA: about 1,107 registrants indexed with a New Orleans address.
+- [/sex-offenders/lansing-mi](https://offendersearch.app/sex-offenders/lansing-mi): Lansing, MI: about 1,079 registrants indexed with a Lansing address.
+- [/sex-offenders/tallahassee-fl](https://offendersearch.app/sex-offenders/tallahassee-fl): Tallahassee, FL: about 1,067 registrants indexed with a Tallahassee address.
+- [/sex-offenders/shreveport-la](https://offendersearch.app/sex-offenders/shreveport-la): Shreveport, LA: about 1,067 registrants indexed with a Shreveport address.
+- [/sex-offenders/toledo-oh](https://offendersearch.app/sex-offenders/toledo-oh): Toledo, OH: about 1,042 registrants indexed with a Toledo address.
+- [/sex-offenders/oakland-ca](https://offendersearch.app/sex-offenders/oakland-ca): Oakland, CA: about 1,034 registrants indexed with a Oakland address.
+- [/sex-offenders/knoxville-tn](https://offendersearch.app/sex-offenders/knoxville-tn): Knoxville, TN: about 1,024 registrants indexed with a Knoxville address.
+- [/sex-offenders/stockton-ca](https://offendersearch.app/sex-offenders/stockton-ca): Stockton, CA: about 1,000 registrants indexed with a Stockton address.
+- [/sex-offenders/springfield-il](https://offendersearch.app/sex-offenders/springfield-il): Springfield, IL: about 990 registrants indexed with a Springfield address.
+- [/sex-offenders/honolulu-hi](https://offendersearch.app/sex-offenders/honolulu-hi): Honolulu, HI: about 987 registrants indexed with a Honolulu address.
+- [/sex-offenders/san-francisco-ca](https://offendersearch.app/sex-offenders/san-francisco-ca): San Francisco, CA: about 984 registrants indexed with a San Francisco address.
+- [/sex-offenders/north-charleston-sc](https://offendersearch.app/sex-offenders/north-charleston-sc): North Charleston, SC: about 967 registrants indexed with a North Charleston address.
+- [/sex-offenders/charleston-sc](https://offendersearch.app/sex-offenders/charleston-sc): Charleston, SC: about 962 registrants indexed with a Charleston address.
+- [/sex-offenders/tulsa-ok](https://offendersearch.app/sex-offenders/tulsa-ok): Tulsa, OK: about 959 registrants indexed with a Tulsa address.
+- [/sex-offenders/fort-wayne-in](https://offendersearch.app/sex-offenders/fort-wayne-in): Fort Wayne, IN: about 946 registrants indexed with a Fort Wayne address.
+- [/sex-offenders/boise-id](https://offendersearch.app/sex-offenders/boise-id): Boise, ID: about 942 registrants indexed with a Boise address.
+- [/sex-offenders/hampton-va](https://offendersearch.app/sex-offenders/hampton-va): Hampton, VA: about 927 registrants indexed with a Hampton address.
+- [/sex-offenders/saint-paul-mn](https://offendersearch.app/sex-offenders/saint-paul-mn): Saint Paul, MN: about 922 registrants indexed with a Saint Paul address.
+- [/sex-offenders/amarillo-tx](https://offendersearch.app/sex-offenders/amarillo-tx): Amarillo, TX: about 917 registrants indexed with a Amarillo address.
+- [/sex-offenders/henderson-nv](https://offendersearch.app/sex-offenders/henderson-nv): Henderson, NV: about 908 registrants indexed with a Henderson address.
+- [/sex-offenders/des-moines-ia](https://offendersearch.app/sex-offenders/des-moines-ia): Des Moines, IA: about 908 registrants indexed with a Des Moines address.
+- [/sex-offenders/chattanooga-tn](https://offendersearch.app/sex-offenders/chattanooga-tn): Chattanooga, TN: about 906 registrants indexed with a Chattanooga address.
+- [/sex-offenders/birmingham-al](https://offendersearch.app/sex-offenders/birmingham-al): Birmingham, AL: about 903 registrants indexed with a Birmingham address.
+- [/sex-offenders/columbus-ga](https://offendersearch.app/sex-offenders/columbus-ga): Columbus, GA: about 887 registrants indexed with a Columbus address.
+- [/sex-offenders/syracuse-ny](https://offendersearch.app/sex-offenders/syracuse-ny): Syracuse, NY: about 868 registrants indexed with a Syracuse address.
+- [/sex-offenders/hartford-ct](https://offendersearch.app/sex-offenders/hartford-ct): Hartford, CT: about 862 registrants indexed with a Hartford address.
+- [/sex-offenders/long-beach-ca](https://offendersearch.app/sex-offenders/long-beach-ca): Long Beach, CA: about 855 registrants indexed with a Long Beach address.
+- [/sex-offenders/buffalo-ny](https://offendersearch.app/sex-offenders/buffalo-ny): Buffalo, NY: about 845 registrants indexed with a Buffalo address.
+- [/sex-offenders/fort-lauderdale-fl](https://offendersearch.app/sex-offenders/fort-lauderdale-fl): Fort Lauderdale, FL: about 843 registrants indexed with a Fort Lauderdale address.
+- [/sex-offenders/portsmouth-va](https://offendersearch.app/sex-offenders/portsmouth-va): Portsmouth, VA: about 824 registrants indexed with a Portsmouth address.
+- [/sex-offenders/savannah-ga](https://offendersearch.app/sex-offenders/savannah-ga): Savannah, GA: about 813 registrants indexed with a Savannah address.
+- [/sex-offenders/st-petersburg-fl](https://offendersearch.app/sex-offenders/st-petersburg-fl): St. Petersburg, FL: about 802 registrants indexed with a St. Petersburg address.
+- [/sex-offenders/seattle-wa](https://offendersearch.app/sex-offenders/seattle-wa): Seattle, WA: about 789 registrants indexed with a Seattle address.
+- [/sex-offenders/kansas-city-ks](https://offendersearch.app/sex-offenders/kansas-city-ks): Kansas City, KS: about 780 registrants indexed with a Kansas City address.
+- [/sex-offenders/beaumont-tx](https://offendersearch.app/sex-offenders/beaumont-tx): Beaumont, TX: about 776 registrants indexed with a Beaumont address.
+
+## Accountability
+
+- [/about](https://offendersearch.app/about): The entity behind the API and how to reach a person (support@offendersearch.app).
+- [/methodology](https://offendersearch.app/methodology): Provenance, refresh cadence, how match strength is labelled, corrections.
+- [/trust](https://offendersearch.app/trust): Security and compliance posture.
+- [/terms](https://offendersearch.app/terms): Terms of service, acceptable use and FCRA limits.
+- [/privacy](https://offendersearch.app/privacy): What is collected, how it is used and retained, and how to exercise rights.

@@ -1,0 +1,41 @@
+generated: '2026-09-03'
+method: searched
+source: >-
+  https://offendersearch.app/docs.md, https://offendersearch.app/docs/freshness.md,
+  https://offendersearch.app/.well-known/api-catalog; status-page and changelog
+  paths probed 2026-09-03.
+versioning:
+  scheme: URI path version (/v1/...)
+  current: v1 (OpenAPI info.version 1.0.0)
+  policy_published: false
+  note: No published versioning or breaking-change policy found in the docs.
+deprecation:
+  policy_published: false
+  sunset_headers: false
+  deprecated_operations: []
+  note: >-
+    No deprecation policy, Sunset/Deprecation headers, or deprecated:true
+    operations in the OpenAPI. The offenders.io compat endpoints
+    (/v1/compat/sexoffender) exist for migration FROM a legacy third-party
+    API, documented at /docs/migration.md.
+status_page:
+  published: false
+  probes:
+    - url: https://offendersearch.app/status
+      status: 404
+  live_health_surface:
+    url: https://api.offendersearch.app/v1/sources
+    status: 200
+    auth: none
+    note: >-
+      Public per-jurisdiction source-health catalog — every registry with
+      status, lastSuccessAt, typicalLatencyMs and ageSeconds. Listed as the
+      "status" link in the provider's RFC 9727 api-catalog; it is per-source
+      API health, not an incident/status page.
+sla:
+  published: false
+changelog:
+  published: false
+  probes:
+    - url: https://offendersearch.app/changelog
+      status: 404

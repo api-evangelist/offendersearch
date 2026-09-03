@@ -1,0 +1,53 @@
+generated: '2026-09-03'
+method: probed
+status: private-beta
+source: https://offendersearch.app/mcp-server
+description: >-
+  Offendersearch operates an official hosted (remote) MCP server. The marketing
+  page (/mcp-server) describes it as private beta — "the hosted endpoint is not
+  yet open to self-serve signups" — and shows the client config pointing at
+  https://mcp.offendersearch.app with an X-API-Key header. Probed 2026-09-03:
+  POST https://mcp.offendersearch.app/mcp answered a JSON-RPC tools/list
+  unauthenticated with the live tool schemas (five tools, saved verbatim to
+  offendersearch-mcp-tools.json), so the tool surface below is the server's own
+  answer, not the marketing copy. The page lists three tools; the live server
+  exposes five — the two criminal-records tools are newer than the page. Tool
+  calls are metered the same as REST calls ($0.15/call, $0.11 past 2,000/mo).
+server:
+  name: offendersearch
+  transport: http
+  url: https://mcp.offendersearch.app/mcp
+  auth: api-key
+  auth_header: X-API-Key
+deployment:
+  mode: remote
+  endpoint: https://mcp.offendersearch.app/mcp
+  auth: api-key
+  verified: probed
+  probe:
+    method: tools/list (JSON-RPC over streamable HTTP)
+    status: 200
+    note: >-
+      tools/list answered unauthenticated with full inputSchemas; tool CALLS
+      are API-key metered. The config block on /mcp-server names the host root
+      (https://mcp.offendersearch.app); the live JSON-RPC path is /mcp — the
+      root itself 404s on POST.
+  checked: '2026-09-03'
+tools:
+  - name: search_offenders
+    description: >-
+      Search US sex-offender registries for one person and/or location. Fans
+      out across all 58 registries (or the ones named in jurisdictions),
+      de-duplicates people across registries, scores each match, and returns
+      the normalized records.
+  - name: batch_search
+    description: Up to 1,000 queries in one call, one row in and one row out.
+  - name: get_registry_coverage
+    description: >-
+      Public catalog of every US registry covered, with scope, legal status
+      and health. No API key required.
+  - name: search_criminal
+    description: Search US criminal records — jail, prison, court and warrant.
+  - name: get_criminal_coverage
+    description: Coverage catalog for the criminal jurisdictions.
+tools_schemas: mcp/offendersearch-mcp-tools.json

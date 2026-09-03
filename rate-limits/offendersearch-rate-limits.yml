@@ -1,0 +1,25 @@
+generated: '2026-09-03'
+method: searched
+source: https://offendersearch.app/docs/errors.md
+description: >-
+  Requests are rate limited per API key; the sustained rate and monthly quota
+  are set by the account's plan and the numeric values are not published. The
+  runtime signal is fully documented: every response carries the current limit
+  state in X-RateLimit-* headers, and a 429 carries Retry-After (seconds).
+limit_count: 0
+limits: []
+note: >-
+  Numeric limits are plan-defined and undocumented; the provider's guidance is
+  to throttle proactively off the headers, prefer async/batch for large jobs,
+  and back off exponentially respecting Retry-After.
+scope: per-key
+exhaustion_status: 429
+headers:
+  - name: X-RateLimit-Limit
+    meaning: Requests allowed in the current window.
+  - name: X-RateLimit-Remaining
+    meaning: Requests left in the current window.
+  - name: X-RateLimit-Reset
+    meaning: Unix time when the window resets.
+  - name: Retry-After
+    meaning: On a 429, seconds to wait before retrying.

@@ -1,0 +1,46 @@
+generated: '2026-09-03'
+method: probed
+description: >-
+  Results of probing the /.well-known/ discovery surface on the website host
+  (offendersearch.app) and the API host (api.offendersearch.app). Status is the
+  HTTP code observed at fetch time. offendersearch.app serves a real RFC 9727
+  api-catalog linkset (saved verbatim); its 404s return a branded HTML 404 page
+  with a true 404 status, so there is no soft-404 ambiguity. The API host
+  returns JSON 404s for every path.
+hosts:
+  - host: https://offendersearch.app
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 200
+        type: application/linkset+json
+        file: offendersearch-api-catalog.json
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://api.offendersearch.app
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404

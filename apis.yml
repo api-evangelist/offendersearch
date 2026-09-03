@@ -1,7 +1,6 @@
 name: Offendersearch
-description: >-
-  A commercial REST API (and private-beta MCP server) for nationwide US sex-offender registry screening, searching 58 US
-  registries through one API with scored matches and per-source provenance.
+description: A commercial REST API (and private-beta MCP server) for nationwide US sex-offender registry screening,
+  searching 58 US registries through one API with scored matches and per-source provenance.
 url: https://raw.githubusercontent.com/api-evangelist/offendersearch/refs/heads/main/apis.yml
 deliveryModel:
   model: unknown
@@ -15,9 +14,39 @@ deliveryModel:
   generated: '2026-08-28'
   method: derived
 created: '2026-08-23'
-modified: '2026-08-23'
+modified: '2026-09-03'
 specificationVersion: '0.21'
 tags:
+- Background Screening
+- Identity & risk
+- Trust and Safety
+- Public Records
+- Criminal data
+- Compliance
+- Sex-offender registry data
+- Staffing & recruiting
+- Tenant Screening
+- Healthcare
+- Gig marketplaces
+tags_raw:
+- Background screening
+- Identity & risk
+- Trust & Safety
+- Public records
+- Criminal data
+- Compliance
+- Sex-offender registry data
+- Staffing & recruiting
+- Tenant screening
+- Healthcare
+- Gig marketplaces
+apis:
+- name: Offendersearch API
+  description: REST API for national sex-offender screening; API-key authenticated, JSON responses, synchronous
+    and asynchronous search across all 58 US registries.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
   - Background Screening
   - Identity & risk
   - Trust and Safety
@@ -29,7 +58,7 @@ tags:
   - Tenant Screening
   - Healthcare
   - Gig marketplaces
-tags_raw:
+  tags_raw:
   - Background screening
   - Identity & risk
   - Trust & Safety
@@ -41,61 +70,94 @@ tags_raw:
   - Tenant screening
   - Healthcare
   - Gig marketplaces
-apis:
-  - name: Offendersearch API
-    description: >-
-      REST API for national sex-offender screening; API-key authenticated, JSON responses, synchronous and asynchronous
-      search across all 58 US registries.
-    humanURL: https://offendersearch.app/docs
-    baseURL: https://api.offendersearch.app
-    tags:
-      - Background Screening
-      - Identity & risk
-      - Trust and Safety
-      - Public Records
-      - Criminal data
-      - Compliance
-      - Sex-offender registry data
-      - Staffing & recruiting
-      - Tenant Screening
-      - Healthcare
-      - Gig marketplaces
-    tags_raw:
-      - Background screening
-      - Identity & risk
-      - Trust & Safety
-      - Public records
-      - Criminal data
-      - Compliance
-      - Sex-offender registry data
-      - Staffing & recruiting
-      - Tenant screening
-      - Healthcare
-      - Gig marketplaces
-    properties:
-      - type: OpenAPI
-        url: https://offendersearch.app/openapi.json
-      - type: OpenAPI
-        url: https://offendersearch.app/openapi.yaml
-      - type: Documentation
-        url: https://offendersearch.app/docs
-      - type: Documentation
-        url: https://offendersearch.app/docs/quickstart
-      - type: Documentation
-        url: https://offendersearch.app/docs/authentication
-      - type: Documentation
-        url: https://offendersearch.app/docs.md
-      - type: Documentation
-        url: https://offendersearch.app/docs/all.md
-      - type: Documentation
-        url: https://offendersearch.app/mcp-server
-      - type: Documentation
-        url: https://offendersearch.app/ai-integration
+  properties:
+  - type: OpenAPI
+    url: https://offendersearch.app/openapi.json
+  - type: OpenAPI
+    url: https://offendersearch.app/openapi.yaml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: OpenAPI
+    url: openapi/offendersearch-openapi.json
+  - type: Overlay
+    url: overlays/offendersearch-openapi-overlay.yaml
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
 maintainers:
-  - FN: Offendersearch
-    url: https://offendersearch.app/
+- FN: Offendersearch
+  url: https://offendersearch.app/
+  email: support@offendersearch.app
 generated:
   by: apis.io/add
   model: claude-opus-4-8
   confidence: 95
   at: '2026-08-23T02:49:47.318Z'
+common:
+- type: DomainSecurity
+  url: security/offendersearch-domain-security.yml
+- type: Authentication
+  url: authentication/offendersearch-authentication.yml
+- type: LLMsTxt
+  url: llms/offendersearch-llms.txt
+- type: WellKnown
+  url: well-known/offendersearch-well-known.yml
+- type: MCPServer
+  url: mcp/offendersearch-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: TermsOfService
+  url: https://offendersearch.app/terms
+- type: PrivacyPolicy
+  url: https://offendersearch.app/privacy
+- type: Support
+  url: https://offendersearch.app/contact
+- type: Blog
+  url: https://offendersearch.app/blog
+- type: SignUp
+  url: https://offendersearch.app/sign-up
+- type: Login
+  url: https://offendersearch.app/sign-in
+image: https://offendersearch.app/opengraph-image.png
+x-enrichment:
+  date: '2026-09-03'
+  status: enriched
+  artifacts_added: 25
+  pass: local-v1

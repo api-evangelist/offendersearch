@@ -1,0 +1,64 @@
+generated: '2026-09-03'
+method: searched
+source: https://offendersearch.app/docs/errors.md
+format: custom-envelope
+description: >-
+  Every non-2xx response returns {"error":{"code","message"}} with a stable
+  error.code to switch on and a human-readable message; the same shape on
+  every v1 endpoint. Not RFC 9457. The OpenAPI also carries a FastAPI-style
+  {"detail"} Error schema for framework-level 404s. A 200 can still be a
+  partial result: with a deadlineMs bound, completed sources are returned and
+  every source is labelled in sourceStatus[].
+envelope:
+  shape: '{ "error": { "code", "message" } }'
+  field: error.code
+status_codes:
+  - status: 200
+    title: OK
+    detail: Search completed — or returned partial results under the deadline (read status/counts).
+  - status: 202
+    title: Accepted
+    detail: Asynchronous search accepted; poll resultsUrl or await the webhook.
+  - status: 400
+    title: Bad Request
+    detail: Invalid or missing parameters (e.g. no lastName and no q/location).
+  - status: 401
+    title: Unauthorized
+    detail: Missing or invalid X-API-Key header, or a request outside the key's scope.
+    code: unauthorized
+  - status: 402
+    title: Payment Required
+    detail: Billing is not enabled on the account (trial exhausted or reports without billing).
+  - status: 404
+    title: Not Found
+    detail: The search id or record id does not exist.
+  - status: 422
+    title: Unprocessable Entity
+    detail: >-
+      A deliberate decline, not a failure: either the query cannot be answered
+      completely (nothing to narrow on — send at least one of lastName, dob,
+      age, city, zipcode, a lat/lng radius, or q; a name + DOB query is never
+      refused), or a parameter is malformed/unrecognised. The message is a
+      plain sentence you can show a user.
+    code: unprocessable_query
+  - status: 429
+    title: Too Many Requests
+    detail: Rate limit or plan quota exceeded; back off per the Retry-After header.
+  - status: 504
+    title: Deadline Exceeded
+    detail: Returned only when deadlineMs is hit and onDeadline = "error".
+codes:
+  - code: invalid_request
+    remediation: Fix the named parameter; the message states which.
+  - code: unauthorized
+    remediation: Send a valid key in the X-API-Key header.
+  - code: unprocessable_query
+    remediation: >-
+      Add a narrowing field (lastName, dob, age, city, zipcode, lat/lng
+      radius, or q); a firstName alone is not enough.
+partial_results:
+  field: sourceStatus[].incompleteReason
+  enum: [deadline, truncated, excluded, not_searched, unavailable, error]
+  note: >-
+    Closed enum; incompleteReason is non-null iff incomplete is true. Each
+    value says whether retrying the identical request can change the answer.

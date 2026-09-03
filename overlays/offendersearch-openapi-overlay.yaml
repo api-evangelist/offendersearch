@@ -1,0 +1,34 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — Offendersearch API
+  version: 1.0.0
+  x-generated: '2026-09-03'
+  x-method: generated
+  x-source: >-
+    Facts read from the provider's own published pages on 2026-09-03
+    (offendersearch.app footer, /terms, /.well-known/api-catalog, /llms.txt);
+    the original spec at https://offendersearch.app/openapi.json is left
+    untouched.
+extends: openapi/offendersearch-openapi.json
+actions:
+  - target: $.info
+    description: >-
+      Add the support contact and terms of service the provider publishes on
+      its site footer and in its RFC 9727 api-catalog, which the spec omits.
+    update:
+      contact:
+        name: Offendersearch support
+        email: support@offendersearch.app
+        url: https://offendersearch.app/contact
+      termsOfService: https://offendersearch.app/terms
+  - target: $.info
+    description: Link the provider's machine-readable discovery surface.
+    update:
+      x-llms-txt: https://offendersearch.app/llms.txt
+      x-api-catalog: https://offendersearch.app/.well-known/api-catalog
+      x-mcp-server: https://mcp.offendersearch.app/mcp
+  - target: $.externalDocs
+    description: Point at the markdown twin of the full documentation.
+    update:
+      description: Complete API reference as one markdown document
+      url: https://offendersearch.app/docs.md

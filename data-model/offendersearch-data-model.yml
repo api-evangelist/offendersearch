@@ -1,0 +1,79 @@
+generated: '2026-09-03'
+method: derived
+source: >-
+  Derived from the components.schemas of openapi/offendersearch-openapi.json
+  (46 schemas) and the object reference at
+  https://offendersearch.app/docs/record-object.md.
+description: >-
+  Entity-relationship graph of the search surface. The central object is the
+  Record — one normalized 76-field schema across every jurisdiction — which is
+  a MERGE product: one person found in several registries is de-duplicated
+  into one Record whose recordId/uuid describe the winning row, so recordId is
+  scoped to the search that produced it, not a stable key for a person (the
+  spec says so explicitly).
+id_prefixes:
+  - prefix: rec_
+    entity: Record
+    note: rec_ + 20 hex, hashed from jurisdiction + registry uuid (or url + name + dob when no uuid). Not a stable person key.
+  - prefix: srch_
+    entity: SearchResponse (async job)
+  - prefix: os_live_
+    entity: ApiKey secret
+entities: [SearchRequest, Query, LiveBlock, SearchResponse, SourceStatus, Record, Name, Address, Offense, SourceRef, StateData, ProofBundle, SourceInfo, Account, ApiKey, Usage, Billing]
+relationships:
+  - from: SearchRequest
+    to: Query
+    kind: has_one
+    via: query
+  - from: SearchRequest
+    to: LiveBlock
+    kind: has_one
+    via: live
+  - from: SearchResponse
+    to: Record
+    kind: has_many
+    via: records[]
+  - from: SearchResponse
+    to: SourceStatus
+    kind: has_many
+    via: sourceStatus[]
+  - from: Record
+    to: Name
+    kind: has_one
+    via: name
+  - from: Record
+    to: Name
+    kind: has_many
+    via: aliases[]
+  - from: Record
+    to: Address
+    kind: has_many
+    via: addresses[]
+  - from: Record
+    to: Offense
+    kind: has_one
+    via: offense
+  - from: Record
+    to: Offense
+    kind: has_many
+    via: offenses[]
+  - from: Record
+    to: SourceRef
+    kind: has_many
+    via: sources[] (per-source provenance, each with recordUrl + lastCheckedAt)
+  - from: Record
+    to: StateData
+    kind: has_one
+    via: stateData
+  - from: SourceStatus
+    to: SourceInfo
+    kind: belongs_to
+    via: source (jurisdiction code, joins the /v1/sources coverage catalog)
+  - from: ProofBundle
+    to: SearchResponse
+    kind: belongs_to
+    via: searchId (a report is generated from a search run within the last 7 days)
+  - from: ApiKey
+    to: Account
+    kind: belongs_to
+    via: account (usage is attributed per key)

@@ -1,0 +1,27 @@
+generated: '2026-09-03'
+method: searched
+description: >-
+  No first-party client libraries are published to any package registry.
+  Probed 2026-09-03: registry.npmjs.org/offendersearch -> 404,
+  pypi.org/pypi/offendersearch/json -> 404; the docs quickstart integrates via
+  plain fetch/requests/curl and links no SDK. The only first-party-looking code
+  distribution is a GitHub quickstart repo of runnable examples (not a
+  package): github.com/Clavaa/offendersearch-quickstart — its homepage is
+  https://offendersearch.app and its description matches the provider's own
+  copy, but the owning org name (Clavaa) is not confirmed on the provider's
+  site, so it is recorded without an official flag.
+packages: []
+probes:
+  - registry: npm
+    package: offendersearch
+    url: https://registry.npmjs.org/offendersearch
+    status: 404
+  - registry: pypi
+    package: offendersearch
+    url: https://pypi.org/pypi/offendersearch/json
+    status: 404
+related_repos:
+  - url: https://github.com/Clavaa/offendersearch-quickstart
+    kind: examples
+    official: false
+    note: Node, Python and curl examples; homepage points at offendersearch.app; last push 2026-08-23.

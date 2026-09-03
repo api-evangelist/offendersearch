@@ -1,0 +1,20 @@
+generated: '2026-09-03'
+method: searched
+source: https://offendersearch.app/pricing
+description: >-
+  No separate sandbox environment or test-mode keys exist — the provider is
+  explicit that the free trial "is real data from all 58 registries, not a
+  sandbox". Testing happens on a live key under a trial quota; the same key
+  and code carry over unchanged when billing is added.
+environments:
+  - name: production (trial quota)
+    base_url: https://api.offendersearch.app
+    key_prefix: os_live_
+    notes:
+      - 25 free searches, no card and no sales call required.
+      - Trial searches must include a name (first or last) in the query; age/city/ZIP/state-only queries need a payment method on file.
+      - Trial searches return up to 50 records each — same schema, scoring and provenance as a paid key.
+      - When the trial runs out, calls return 402 until a payment method is added; nothing is deleted and the key does not expire.
+test_credentials: none-published
+test_modes: none-published
+fixtures: none-published
