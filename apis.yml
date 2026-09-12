@@ -131,6 +131,8 @@ generated:
   confidence: 95
   at: '2026-08-23T02:49:47.318Z'
 common:
+- type: Website
+  url: https://www.offendersearch.app/
 - type: DomainSecurity
   url: security/offendersearch-domain-security.yml
 - type: Authentication
