@@ -41,40 +41,16 @@ tags_raw:
 - Healthcare
 - Gig marketplaces
 apis:
-- name: Offendersearch API
-  description: REST API for national sex-offender screening; API-key authenticated, JSON responses, synchronous
-    and asynchronous search across all 58 US registries.
+- aid: offendersearch:offendersearch-account-api
+  name: Offendersearch Account API
+  description: The Account API from Offendersearch — 1 operation(s) for account.
   humanURL: https://offendersearch.app/docs
   baseURL: https://api.offendersearch.app
   tags:
-  - Background Screening
-  - Identity & risk
-  - Trust and Safety
-  - Public Records
-  - Criminal data
-  - Compliance
-  - Sex-offender registry data
-  - Staffing & recruiting
-  - Tenant Screening
-  - Healthcare
-  - Gig marketplaces
-  tags_raw:
-  - Background screening
-  - Identity & risk
-  - Trust & Safety
-  - Public records
-  - Criminal data
-  - Compliance
-  - Sex-offender registry data
-  - Staffing & recruiting
-  - Tenant screening
-  - Healthcare
-  - Gig marketplaces
+  - Account
   properties:
   - type: OpenAPI
-    url: https://offendersearch.app/openapi.json
-  - type: OpenAPI
-    url: https://offendersearch.app/openapi.yaml
+    url: openapi/offendersearch-account-api-openapi.yml
   - type: Documentation
     url: https://offendersearch.app/docs
   - type: Documentation
@@ -89,10 +65,838 @@ apis:
     url: https://offendersearch.app/mcp-server
   - type: Documentation
     url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-admin-api
+  name: Offendersearch Admin API
+  description: The Admin API from Offendersearch — 11 operation(s) for admin.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Admin
+  properties:
   - type: OpenAPI
-    url: openapi/offendersearch-openapi.json
-  - type: Overlay
-    url: overlays/offendersearch-openapi-overlay.yaml
+    url: openapi/offendersearch-admin-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-auth-api
+  name: Offendersearch Auth API
+  description: The Auth API from Offendersearch — 2 operation(s) for auth.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Auth
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-auth-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-batch-api
+  name: Offendersearch Batch API
+  description: The Batch API from Offendersearch — 1 operation(s) for batch.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Batch
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-batch-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-billing-api
+  name: Offendersearch Billing API
+  description: The Billing API from Offendersearch — 1 operation(s) for billing.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-billing-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-compat-api
+  name: Offendersearch Compat API
+  description: The Compat API from Offendersearch — 1 operation(s) for compat.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Compat
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-compat-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-criminal-api
+  name: Offendersearch Criminal API
+  description: The Criminal API from Offendersearch — 2 operation(s) for criminal.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Criminal
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-criminal-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-keys-api
+  name: Offendersearch Keys API
+  description: The Keys API from Offendersearch — 3 operation(s) for keys.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-keys-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-proof-docs-api
+  name: Offendersearch Proof Docs API
+  description: The Proof Docs API from Offendersearch — 1 operation(s) for proof docs.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Proof Docs
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-proof-docs-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-records-api
+  name: Offendersearch Records API
+  description: The Records API from Offendersearch — 1 operation(s) for records.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Records
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-records-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-report-api
+  name: Offendersearch Report API
+  description: The Report API from Offendersearch — 1 operation(s) for report.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Report
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-report-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-search-api
+  name: Offendersearch Search API
+  description: The Search API from Offendersearch — 1 operation(s) for search.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Search
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-search-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-searches-api
+  name: Offendersearch Searches API
+  description: The Searches API from Offendersearch — 3 operation(s) for searches.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Searches
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-searches-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-sources-api
+  name: Offendersearch Sources API
+  description: The Sources API from Offendersearch — 1 operation(s) for sources.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Sources
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-sources-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-support-api
+  name: Offendersearch Support API
+  description: The Support API from Offendersearch — 1 operation(s) for support.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Support
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-support-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-team-api
+  name: Offendersearch Team API
+  description: The Team API from Offendersearch — 2 operation(s) for team.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Team
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-team-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
+  - type: ErrorCatalog
+    url: errors/offendersearch-problem-types.yml
+  - type: Conformance
+    url: conformance/offendersearch-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/offendersearch-lifecycle.yml
+  - type: Conventions
+    url: conventions/offendersearch-conventions.yml
+  - type: Idempotency
+    url: conventions/offendersearch-conventions.yml
+  - type: DataModel
+    url: data-model/offendersearch-data-model.yml
+  - type: Sandbox
+    url: sandbox/offendersearch-sandbox.yml
+  - type: Plans
+    url: plans/offendersearch-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/offendersearch-rate-limits.yml
+  - type: Webhooks
+    url: asyncapi/offendersearch-webhooks.yml
+  - type: ToolCrosswalk
+    url: mcp/offendersearch-tool-crosswalk.yml
+  - type: APIReference
+    url: https://offendersearch.app/docs
+  - type: GettingStarted
+    url: https://offendersearch.app/docs/quickstart
+  - type: Pricing
+    url: https://offendersearch.app/pricing
+- aid: offendersearch:offendersearch-usage-api
+  name: Offendersearch Usage API
+  description: The Usage API from Offendersearch — 1 operation(s) for usage.
+  humanURL: https://offendersearch.app/docs
+  baseURL: https://api.offendersearch.app
+  tags:
+  - Usage
+  properties:
+  - type: OpenAPI
+    url: openapi/offendersearch-usage-api-openapi.yml
+  - type: Documentation
+    url: https://offendersearch.app/docs
+  - type: Documentation
+    url: https://offendersearch.app/docs/quickstart
+  - type: Documentation
+    url: https://offendersearch.app/docs/authentication
+  - type: Documentation
+    url: https://offendersearch.app/docs.md
+  - type: Documentation
+    url: https://offendersearch.app/docs/all.md
+  - type: Documentation
+    url: https://offendersearch.app/mcp-server
+  - type: Documentation
+    url: https://offendersearch.app/ai-integration
   - type: ErrorCatalog
     url: errors/offendersearch-problem-types.yml
   - type: Conformance
@@ -131,6 +935,8 @@ generated:
   confidence: 95
   at: '2026-08-23T02:49:47.318Z'
 common:
+- type: Overlay
+  url: overlays/offendersearch-openapi-overlay.yaml
 - type: Website
   url: https://www.offendersearch.app/
 - type: DomainSecurity
