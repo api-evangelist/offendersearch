@@ -1,0 +1,159 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Auth API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Auth
+paths:
+  /v1/auth/signup:
+    post:
+      operationId: signup
+      summary: Create an account (returns a session token)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupBody'
+      responses:
+        '200':
+          description: Account created; session token + account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '400':
+          description: Validation error (missing org, bad email, weak password, terms not accepted).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: An account with that email already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Auth
+  /v1/auth/login:
+    post:
+      operationId: login
+      summary: Verify credentials (returns a session token)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        '200':
+          description: Session token + account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '401':
+          description: Invalid email or password.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Auth
+components:
+  schemas:
+    LoginBody:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    AuthResult:
+      type: object
+      properties:
+        token:
+          type: string
+          description: 'Signed session token (use as Authorization: Bearer).'
+        account:
+          $ref: '#/components/schemas/Account'
+    SignupBody:
+      type: object
+      required:
+      - email
+      - password
+      - orgName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        orgName:
+          type: string
+        acceptedTerms:
+          type: boolean
+          default: false
+          description: Must be true to sign up.
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+        orgName:
+          type: string
+        email:
+          type: string
+          format: email
+        billingEnabled:
+          type: boolean
+        plan:
+          type: string
+          enum:
+          - metered
+        createdAt:
+          type: string
+          format: date-time
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

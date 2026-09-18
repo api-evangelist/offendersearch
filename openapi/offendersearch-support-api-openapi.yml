@@ -1,0 +1,209 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Support API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Support
+paths:
+  /v1/support:
+    post:
+      operationId: submitSupportMessage
+      summary: Send a message to the Offendersearch team
+      description: 'Sends a message to our support team. **No API key required** — this is the endpoint behind the contact form on offendersearch.app, and it is open because the people who need it most are the ones who do not have a key yet.
+
+
+        A `200` means the message is **recorded**: it is stored against the `submissionId` in the response and can be looked up by that id if you ever need to refer to it. It does not report that an email has arrived anywhere, because that is a separate step we do not make you wait for.
+
+
+        Replies come from the address in `supportEmail`, normally within one business day. You can also write to that address directly; both routes reach the same inbox.
+
+
+        The endpoint accepts `application/json` or `application/x-www-form-urlencoded`, so an ordinary HTML form can post to it without any JavaScript.'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupportRequest'
+      responses:
+        '200':
+          description: The message was recorded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportResult'
+        '413':
+          description: 'The body is larger than this endpoint accepts (64 KB). Send a summary and reply to our answer with anything bulky.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 'A required field is missing or the email address is not a valid address. Nothing was stored; correct it and send again.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: 'Too many messages from one address in a short period. Nothing was stored, so nothing is duplicated when you retry. `Retry-After` gives the number of seconds to wait, and the same value is in `detail.retryAfterSeconds`.
+
+            '
+          headers:
+            Retry-After:
+              description: Seconds to wait before sending the message again.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+        '503':
+          description: 'The message could not be recorded, so **do not treat it as sent**. Use the address in the error text instead; it is answered by the same team.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Support
+components:
+  schemas:
+    SupportResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - received
+          description: '`received` means the message is recorded and retrievable by `submissionId`.
+
+            '
+        submissionId:
+          type: string
+          description: 'The reference for this message. Quote it if you follow up about the same thread.
+
+            '
+          example: sup_9f2c1a4b6d8e0f31
+        supportEmail:
+          type: string
+          description: 'The address a reply will come from, and the address you can write to directly instead of using this endpoint.
+
+            '
+          example: support@offendersearch.app
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+    SupportRequest:
+      type: object
+      required:
+      - name
+      - email
+      - message
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          description: Who we are replying to.
+          example: Dana Okafor
+        email:
+          type: string
+          maxLength: 254
+          description: 'The address we reply to. It is checked for a valid shape only — we do not send anything to it to confirm it, and it is never added to a list.
+
+            '
+          example: dana@example.org
+        message:
+          type: string
+          minLength: 10
+          maxLength: 8000
+          description: What you would like to ask or tell us.
+        subject:
+          type: string
+          maxLength: 200
+          description: Optional one-line summary.
+        topic:
+          type: string
+          enum:
+          - sales
+          - support
+          - security
+          - baa
+          - other
+          default: support
+          description: 'Which team should read it first. Anything unrecognised is treated as `support`, so a wrong value routes the message rather than refusing it.
+
+            '
+        website:
+          type: string
+          description: 'Leave empty. Present so automated submissions can be told apart from people; a message that fills it in is still recorded.
+
+            '
+        renderedAt:
+          type: integer
+          format: int64
+          description: 'Optional. Unix time in milliseconds when the form was displayed. Omit it if you are calling the endpoint directly — its absence is not held against a submission.
+
+            '
+    RateLimitError:
+      type: object
+      description: 'A refusal that will succeed if you wait. `detail.retryAfterSeconds` always equals the `Retry-After` header — read either, but read one: retrying immediately will simply be refused again.
+
+        '
+      properties:
+        detail:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+              - rate_limited
+              - overloaded
+              description: '`rate_limited` is a per-caller quota and clears by itself. `overloaded` means the service is at capacity.
+
+                '
+            message:
+              type: string
+            retryAfterSeconds:
+              type: integer
+              description: Seconds to wait before retrying. Same as `Retry-After`.
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

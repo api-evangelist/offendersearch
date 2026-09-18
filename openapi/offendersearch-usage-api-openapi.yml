@@ -1,0 +1,115 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Usage API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Usage
+paths:
+  /v1/usage:
+    get:
+      operationId: getUsage
+      summary: Usage + spend for the current billing period (session)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Usage summary derived from the searches table.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Usage
+components:
+  schemas:
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+    Usage:
+      type: object
+      properties:
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        totalCalls:
+          type: integer
+        includedCalls:
+          type: integer
+          description: Calls included before overage (e.g. 2000).
+        currentSpend:
+          type: number
+        proofDocsBilled:
+          type: integer
+        proofSpend:
+          type: number
+        daily:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                description: YYYY-MM-DD
+              calls:
+                type: integer
+              cost:
+                type: number
+        byTier:
+          type: array
+          items:
+            type: object
+            properties:
+              tier:
+                type: string
+                enum:
+                - standard
+                - weekly
+                - daily
+              calls:
+                type: integer
+              cost:
+                type: number
+  responses:
+    Unauthorized:
+      description: Missing or invalid credential.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

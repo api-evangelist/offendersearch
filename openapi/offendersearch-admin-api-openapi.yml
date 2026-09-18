@@ -1,0 +1,825 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Admin API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Admin
+paths:
+  /v1/admin/accounts:
+    get:
+      summary: List all accounts (admin console)
+      security:
+      - AdminAuth: []
+      responses:
+        '200':
+          description: Accounts with key/search counts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getV1AdminAccounts
+      x-operation-id-source: derived
+  /v1/admin/warm-queries:
+    get:
+      summary: List warm queries (curated + top-derived) with hit stats
+      security:
+      - AdminAuth: []
+      responses:
+        '200':
+          description: Warm-query hot set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WarmQuery'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getV1AdminWarmQueries
+      x-operation-id-source: derived
+    post:
+      summary: Add or remove a curated warm query
+      security:
+      - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - add
+                  - remove
+                warmQuery:
+                  $ref: '#/components/schemas/WarmQuery'
+      responses:
+        '200':
+          description: Updated curated set.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - ok
+                  action:
+                    type: string
+                    enum:
+                    - add
+                    - remove
+                  curatedCount:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: postV1AdminWarmQueries
+      x-operation-id-source: derived
+  /v1/admin/warm:
+    post:
+      summary: Trigger a cache-warming run now (keeps the store hot)
+      security:
+      - AdminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                freshness:
+                  type: string
+                  enum:
+                  - standard
+                  - weekly
+                  - daily
+                  default: daily
+                topN:
+                  type: integer
+                  default: 100
+                  description: warm top-N derived + all curated
+                concurrency:
+                  type: integer
+                  default: 8
+      responses:
+        '200':
+          description: Warm run result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WarmRunResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: postV1AdminWarm
+      x-operation-id-source: derived
+  /v1/admin/cache-stats:
+    get:
+      summary: Cache hit rate, hot-set size, last warm run, staleness
+      security:
+      - AdminAuth: []
+      responses:
+        '200':
+          description: Cache stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getV1AdminCacheStats
+      x-operation-id-source: derived
+  /v1/admin/scraper-health:
+    get:
+      summary: Per-scraper performance diagnostics (for humans and AI agents)
+      description: 'Machine-readable health for every scraper: success/error/cache rates, latency p50/p95/max, avg records, truncation counts, last status/error. Backed by packages/diagnostics; raw per-run events are in the JSONL diag log (OFFENDERSEARCH_DIAG_LOG). Optional ?scraper=CODE for one registry.'
+      security:
+      - AdminAuth: []
+      parameters:
+      - name: scraper
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Scraper health summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScraperHealth'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getV1AdminScraperHealth
+      x-operation-id-source: derived
+  /v1/admin/scraper-runs:
+    get:
+      summary: Recent structured run events (tail) for diagnostics
+      security:
+      - AdminAuth: []
+      parameters:
+      - name: scraper
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 50
+      responses:
+        '200':
+          description: Recent scraper run events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScraperRun'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getV1AdminScraperRuns
+      x-operation-id-source: derived
+  /admin/ingest:
+    post:
+      summary: Trigger the nightly cache-refresh ingest run (background)
+      description: Kicks off `packages.ingest.runner` in the background and returns 202 promptly (does NOT block for the multi-hour pull). Target registries via `?states=AZ&states=DC` (or a comma string) OR a JSON body `{"states":[...],"concurrency":N}`; omit for ALL cacheable registries. Poll GET /admin/ingest/status for progress.
+      security:
+      - AdminAuth: []
+      parameters:
+      - name: states
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: concurrency
+        in: query
+        required: false
+        schema:
+          type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                states:
+                  type: array
+                  items:
+                    type: string
+                concurrency:
+                  type: integer
+      responses:
+        '202':
+          description: Ingest scheduled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  started:
+                    oneOf:
+                    - type: string
+                      enum:
+                      - all
+                    - type: array
+                      items:
+                        type: string
+                    description: '"all" or the list of scheduled state codes.'
+                  concurrency:
+                    type: integer
+                  note:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: postAdminIngest
+      x-operation-id-source: derived
+  /admin/ingest/rerun-failures:
+    post:
+      summary: Re-pull only the states whose latest ingest run errored
+      security:
+      - AdminAuth: []
+      parameters:
+      - name: concurrency
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '202':
+          description: Rerun scheduled (empty list when nothing is failing).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rerunning:
+                    type: array
+                    items:
+                      type: string
+                  concurrency:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: postAdminIngestRerunFailures
+      x-operation-id-source: derived
+  /admin/ingest/status:
+    get:
+      summary: 'Per-registry nightly-ingest freshness (alias: /admin/freshness)'
+      description: Per-registry last successful ingest time, record counts, latest-run status/error, and snapshot staleness, read from `ingest_run` rows. Pass `?state=AZ` to scope to one registry.
+      security:
+      - AdminAuth: []
+      parameters:
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Ingest freshness view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getAdminIngestStatus
+      x-operation-id-source: derived
+  /admin/freshness:
+    get:
+      summary: Alias of /admin/ingest/status
+      security:
+      - AdminAuth: []
+      parameters:
+      - name: state
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Ingest freshness view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getAdminFreshness
+      x-operation-id-source: derived
+  /admin/ingest/report:
+    get:
+      summary: Latest per-run ingest report
+      description: 'The latest structured ingest report (`packages.ingest.report`, `latest.json`). Returns 200 with `{"available": false, ...}` when no run has produced a report yet.'
+      security:
+      - AdminAuth: []
+      responses:
+        '200':
+          description: Ingest report (or an availability=false stub).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Admin
+      operationId: getAdminIngestReport
+      x-operation-id-source: derived
+components:
+  schemas:
+    IngestStatus:
+      type: object
+      description: Per-registry nightly-ingest freshness view (GET /admin/ingest/status).
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+        cachedJurisdictions:
+          type: array
+          items:
+            type: string
+        totals:
+          type: object
+          properties:
+            present:
+              type: integer
+            dropped:
+              type: integer
+        lastRunSummary:
+          type: object
+          properties:
+            okCount:
+              type: integer
+            errorCount:
+              type: integer
+            totalRecords:
+              type: integer
+            dbMb:
+              type: number
+            oldestFreshnessHours:
+              type: number
+              nullable: true
+        registries:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestRegistryRow'
+    CacheStats:
+      type: object
+      properties:
+        hitRate:
+          type: number
+          description: Fraction of sync calls served from cache.
+        hotSetSize:
+          type: integer
+        lastWarmRunAt:
+          type: string
+          format: date-time
+          nullable: true
+        staleEntries:
+          type: integer
+        perRegistry:
+          type: array
+          items:
+            type: object
+            properties:
+              registry:
+                type: string
+              warmSuccess:
+                type: boolean
+              lastWarmedAt:
+                type: string
+                format: date-time
+    Query:
+      type: object
+      additionalProperties: false
+      description: 'The person/location query. All fields are optional; supply what you have. DOB/age drive the match-state (see Record.dobVerification). offenders.io parity filters (q/address/prefixMatch/fuzzy/createdAt*/updatedAt*/page/ perPage) are applied uniformly across ALL jurisdictions.
+
+        '
+      properties:
+        firstName:
+          type: string
+          description: Given name.
+          example: John
+        lastName:
+          type: string
+          description: Surname (primary match key).
+          example: Smith
+        dob:
+          type: string
+          format: date
+          description: 'Date of birth, `YYYY-MM-DD`. Optional, and it NARROWS — a record whose published birth evidence conflicts with this date is excluded.
+
+
+            ★ **It does not require us to hold a date of birth for the person.** The date you send is matched against every kind of birth evidence a registry publishes: a full date, a birth year alone, or a published age alone. Records with none of those are still returned on the name, flagged unverified. `matchState` on each record tells you which of those happened and how strong it was — read it there; the four outcomes are `dob_match`, `year_match`, `age_match` and `no_dob_age_year`.
+
+            '
+          example: '1985-06-14'
+        age:
+          type: integer
+          description: Age filter. Used when DOB is unavailable; matched ±1 year for birthday drift.
+          example: 39
+        city:
+          type: string
+          description: Residence city filter.
+          example: Chicago
+        state:
+          type: string
+          description: '2-letter USPS state/territory code (`FL`), case-insensitive; the full state or territory name (`Florida`) is also accepted and means exactly the same thing. A value we cannot resolve to a jurisdiction is rejected with 422 — it is never silently treated as `matches nothing`.
+
+
+            ★ IT IS A UNION, AND YOU SHOULD KNOW WHICH HALF MATCHED. `state` keeps a record when EITHER one of its `addressStates` is that state (they live there) OR its `registrationState` is (that state''s registry holds them). It does NOT change which registries run — all 58 are searched and `state` narrows the answer. (Until 2026-08-05 it silently scoped the fan-out to that state''s own registries, which hid anyone registered elsewhere while residing there; use `locationScoped: true` if you explicitly want the cheaper, narrower search.) Those two halves are genuinely different populations: 105,028 records are registered in a state where they have no address on file, and 70,973 records carry no address state at all and are reachable ONLY by the registration half. Every record comes back carrying both `registrationState` and `addressStates`, so you can tell which half answered without a second call — narrow to residents with `addressStates`, or to a registry''s roster with `jurisdictions: ["FL"]`, which is the registration-only filter.
+
+            '
+          example: IL
+        zipcode:
+          type: string
+          description: Residence ZIP (first 5 used).
+          example: '60614'
+        address:
+          type: string
+          description: 'Parity: fuzzy street-address match (every token must appear in some record address).'
+        lat:
+          type: number
+          description: Latitude for GIS radius search.
+          example: 41.9
+        lng:
+          type: number
+          description: Longitude for GIS radius search.
+          example: -87.65
+        radiusMiles:
+          type: number
+          maximum: 100
+          description: 'Parity: GIS radius in miles. Defaults to 1 when lat/lng given; capped at 100.'
+        q:
+          type: string
+          description: 'Parity: free-text across name/alias/address/city/state/zip (all tokens must appear).'
+        fuzzy:
+          type: boolean
+          description: 'Parity: offenders.io fuzzy toggle. true -> balanced match; false -> strict. Overrides `SearchRequest.match`.'
+        prefixMatch:
+          description: 'PARTIAL-NAME SEARCH. Treat the name(s) you supplied as the START of a name: `thom` returns Thomas, Thompson and Thomason. Accepts "firstName", "lastName", "both" (prefix-match BOTH fields at once), or a list. Matched against every recorded ALIAS as well as the registered legal name; `matchedName` on each record says which one matched. MINIMUM 3 CHARACTERS — a shorter prefix returns 422. Prefix matching is a strict superset of exact matching, and an exact match always ranks above a prefix match. `nameMatch` overrides this.
+
+            '
+          oneOf:
+          - type: string
+            enum:
+            - firstName
+            - lastName
+            - both
+          - type: array
+            items:
+              type: string
+              enum:
+              - firstName
+              - lastName
+        nameMatch:
+          type: object
+          description: 'EXPLICIT PER-FIELD CONTROL over how names are matched — the fine-grained form of `prefixMatch`/`match`. Anything omitted from a field''s list is OFF for that field. Exact matching is always on and cannot be disabled. Overrides both `prefixMatch` and `SearchRequest.match`.
+
+            '
+          properties:
+            firstName:
+              type: array
+              description: Strategies for the first name. prefix requires >=3 characters; middle requires >=2.
+              items:
+                type: string
+                enum:
+                - exact
+                - prefix
+                - nickname
+                - fuzzy
+                - middle
+            lastName:
+              type: array
+              description: Strategies for the last name. prefix requires >=3 characters.
+              items:
+                type: string
+                enum:
+                - exact
+                - prefix
+                - fuzzy
+            aliases:
+              type: boolean
+              default: true
+              description: Also apply these strategies to every recorded alias.
+        faceId:
+          type: string
+          description: Parity input ONLY — facial search is NOT supported; supplying it returns 422 (never a faked face match).
+        createdAtStart:
+          type: string
+          format: date-time
+          description: 'Parity: lower bound on source.scraped_at (when we first recorded the record).'
+        createdAtEnd:
+          type: string
+          format: date-time
+          description: 'Parity: upper bound on source.scraped_at.'
+        updatedAtStart:
+          type: string
+          format: date-time
+          description: 'Parity: lower bound on source.source_updated_at (when the source last changed the record).'
+        updatedAtEnd:
+          type: string
+          format: date-time
+          description: 'Parity: upper bound on source.source_updated_at.'
+        page:
+          type: integer
+          minimum: 1
+          description: 'Parity: 1-based page number. Omit it and the whole match set is returned in a single page — up to the response cap. ★ ABOVE THE CAP, OMITTING IT IS NOT THE SAME AS ASKING FOR EVERYTHING: an unpaginated answer larger than `cappedLimit` (4,000) is trimmed to that many records and says so with `capped: true`, and `cappedOmittedSources` names the registries that contributed nothing to it. A PAGINATED request is never trimmed — it walks the entire match set and `capped` stays `false`. So `counts.records` vs `counts.recordsReturned` is the pair to branch on: if they differ, send `perPage` and page through. Most searches never reach this — a `name + DOB` query returns tens of records — but a bare common surname does. A page past `totalPages` returns an empty `records` array (changed 2026-08-05; it used to re-serve the last page).
+
+            '
+        perPage:
+          type: integer
+          minimum: 1
+          description: 'Parity: page size. Defaults to 20 when paginating. Sending it turns pagination ON, which is what makes an over-cap match set fully reachable. Clamped to `cappedLimit`, so a single page can never rebuild the oversized response the cap exists to prevent.
+
+            '
+        ageTolerance:
+          type: integer
+          minimum: 0
+          maximum: 10
+          default: 1
+          description: 'How many years of slack the age comparison allows, when the query carries a `dob` and the record publishes only an `age`. Eleven registries publish an age and no date at all, so a `name + DOB` search has to compare a searched DATE against a published AGE; how much slack that allows is a risk decision, and it is yours. The default of 1 is not arbitrary — a published age with an unpublished birthday is consistent with two birth years, and the registry may have computed it a refresh before we read it, so the age is anchored to the date we read that page rather than to today. Raise it for a high-recall screening pass: more same-name strangers, fewer missed true matches.
+
+            '
+        onAgeMismatch:
+          type: string
+          enum:
+          - drop
+          - flag
+          default: drop
+          description: 'What to do with a record that matches on NAME but whose published age contradicts the searched `dob`. `drop` (default) omits it. `flag` RETURNS it, labelled `matchState: "age_mismatch"`, and lets you judge — "silently omitted" and "checked, and the age contradicts your date" are different facts. A flagged record is always `unverified` and can never be reported as DOB-confirmed.
+
+            '
+    IngestRegistryRow:
+      type: object
+      properties:
+        jurisdiction:
+          type: string
+        acquisition:
+          type: string
+          description: bulk | enumerate | live | ""
+        status:
+          type: string
+          nullable: true
+        lastIngestedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastRunStartedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastRunFinishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        stale:
+          type: boolean
+        recordCount:
+          type: object
+          properties:
+            present:
+              type: integer
+            dropped:
+              type: integer
+        runRecordCount:
+          type: integer
+        presentCount:
+          type: integer
+        droppedCount:
+          type: integer
+        error:
+          type: string
+          nullable: true
+        freshnessStamp:
+          type: string
+          format: date-time
+          nullable: true
+        freshnessAgeSeconds:
+          type: number
+          nullable: true
+        freshnessAgeHours:
+          type: number
+          nullable: true
+    WarmQuery:
+      type: object
+      description: An internal warm query (kept hot). curated or top-derived.
+      properties:
+        query:
+          $ref: '#/components/schemas/Query'
+        jurisdictions:
+          type: array
+          items:
+            type: string
+          nullable: true
+        locationScoped:
+          type: boolean
+          default: false
+        source:
+          type: string
+          enum:
+          - curated
+          - derived
+        frequency:
+          type: integer
+          description: Observed customer-search count (derived queries only).
+    IngestReport:
+      type: object
+      description: 'Latest per-run ingest report. When no run has produced one yet, only `available:false` (+ note/reportDir) is returned.
+
+        '
+      properties:
+        available:
+          type: boolean
+        note:
+          type: string
+        reportDir:
+          type: string
+      additionalProperties: true
+    AdminAccount:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        orgName:
+          type: string
+        billingEnabled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        activeKeys:
+          type: integer
+        searchCount:
+          type: integer
+    ScraperRun:
+      type: object
+      description: One scraper call within a search — the atomic diagnostic record.
+      properties:
+        ts:
+          type: string
+          format: date-time
+        scraper:
+          type: string
+        status:
+          type: string
+          enum:
+          - ok
+          - error
+          - restricted
+          - no_coverage
+        duration_ms:
+          type: integer
+        records:
+          type: integer
+        from_cache:
+          type: boolean
+        truncated:
+          type: boolean
+          description: Hit a pagination/detail cap.
+        pages:
+          type: integer
+          nullable: true
+        note:
+          type: string
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        query_hash:
+          type: string
+          description: Ties run to a search, no PII.
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+    ScraperHealth:
+      type: object
+      properties:
+        total_runs:
+          type: integer
+        scrapers:
+          type: array
+          items:
+            type: object
+            properties:
+              scraper:
+                type: string
+              runs:
+                type: integer
+              success_rate:
+                type: number
+              error_rate:
+                type: number
+              cache_hit_rate:
+                type: number
+              latency_ms:
+                type: object
+                properties:
+                  p50:
+                    type: integer
+                  p95:
+                    type: integer
+                  max:
+                    type: integer
+              avg_records:
+                type: number
+              truncated_runs:
+                type: integer
+              last_status:
+                type: string
+              last_error:
+                type: string
+                nullable: true
+    WarmRunResult:
+      type: object
+      properties:
+        warmed:
+          type: integer
+        failed:
+          type: integer
+        freshness:
+          type: string
+          enum:
+          - standard
+          - weekly
+          - daily
+        startedAt:
+          type: string
+          format: date-time
+        durationMs:
+          type: integer
+  responses:
+    Unauthorized:
+      description: Missing or invalid credential.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

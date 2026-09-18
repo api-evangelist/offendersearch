@@ -1,0 +1,114 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Sources API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Sources
+paths:
+  /v1/sources:
+    get:
+      operationId: listSources
+      summary: Coverage catalog + live health of every jurisdiction
+      description: The catalog of every jurisdiction we cover, with lightweight health. No API key required — this doubles as public coverage transparency.
+      security: []
+      responses:
+        '200':
+          description: Coverage catalog
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SourceInfo'
+      tags:
+      - Sources
+components:
+  schemas:
+    SourceInfo:
+      type: object
+      description: One jurisdiction from the public coverage catalog.
+      properties:
+        id:
+          type: string
+          example: IL
+        name:
+          type: string
+          example: Illinois Sex Offender Registry
+        covers:
+          type: array
+          items:
+            type: string
+          description: State/territory codes this source covers (some sources cover many).
+        scope:
+          type: string
+          enum:
+          - state
+          - national
+        status:
+          type: string
+          enum:
+          - building
+          - live
+        legal:
+          type: object
+          properties:
+            commercialUse:
+              type: string
+              enum:
+              - allowed
+              - restricted
+              - prohibited
+              - unknown
+        health:
+          type: object
+          properties:
+            lastSuccessAt:
+              type: string
+              format: date-time
+              nullable: true
+              description: When this registry was last ingested successfully — this registry's currency, live. null if it never has been. This endpoint needs no API key, so it is auditable before purchase.
+            typicalLatencyMs:
+              type: integer
+              nullable: true
+              description: p50 latency from local diagnostics. null when not measured on this instance.
+            ageSeconds:
+              type: number
+              nullable: true
+              description: Age of the current snapshot, in seconds. null = never ingested (unknown, never 'fresh').
+            freshFor:
+              type: array
+              items:
+                type: string
+                enum:
+                - daily
+                - weekly
+              description: 'The freshness tiers this registry''s current snapshot falls inside — a restatement of `ageSeconds` in tier labels. `[]` = never ingested. NOT A FILTER: a registry contributes its records to a search whatever this says, at every tier. Read it to KNOW a registry''s age, not to predict which registries will answer. See API-CONTRACT.md §2.
+
+                '
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

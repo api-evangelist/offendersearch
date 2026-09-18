@@ -1,0 +1,88 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Proof Docs API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Proof Docs
+paths:
+  /v1/proof-docs/{token}:
+    get:
+      operationId: getProofDoc
+      summary: Fetch a rendered verification-report document
+      description: Serves the rendered proof document referenced by a ProofBundle document `url`. Returns the raw file body with the appropriate content type (`application/pdf` or `text/html`), not JSON.
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Opaque document token from a ProofBundle document `url`.
+      responses:
+        '200':
+          description: The rendered document.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            text/html:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - Proof Docs
+components:
+  schemas:
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+  responses:
+    NotFound:
+      description: Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid credential.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

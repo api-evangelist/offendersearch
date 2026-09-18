@@ -1,0 +1,220 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Keys API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Keys
+paths:
+  /v1/keys:
+    get:
+      operationId: listKeys
+      summary: List API keys for the account (session)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: The account's API keys (masked; secrets are never re-shown).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKey'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Keys
+    post:
+      operationId: createKey
+      summary: Create an API key (secret shown once)
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKeyBody'
+      responses:
+        '201':
+          description: Key created. `secret` is returned ONCE here; only its hash is stored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyWithSecret'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Keys
+  /v1/keys/{keyId}/rotate:
+    post:
+      operationId: rotateKey
+      summary: Rotate an API key (new secret shown once)
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: keyId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Rotated key; new `secret` returned once.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyWithSecret'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Key not found or revoked.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Keys
+  /v1/keys/{keyId}:
+    delete:
+      operationId: deleteKey
+      summary: Revoke an API key
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: keyId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Key revoked.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - revoked
+                  id:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Key not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - Keys
+components:
+  schemas:
+    ApiKeyWithSecret:
+      allOf:
+      - $ref: '#/components/schemas/ApiKey'
+      - type: object
+        properties:
+          secret:
+            type: string
+            description: Full key secret — returned ONCE on create/rotate; only its hash is stored.
+    CreateKeyBody:
+      type: object
+      properties:
+        name:
+          type: string
+          default: Untitled key
+        freshness:
+          type: array
+          items:
+            type: string
+            enum:
+            - standard
+            - weekly
+            - daily
+          nullable: true
+          description: LEGACY/UNENFORCED. Freshness is a PER-REQUEST parameter on /v1/search and is NOT provisioned on the key — any valid key may send `daily` or `weekly` and is billed accordingly. This field is retained for compatibility and does not gate anything.
+        proof:
+          type: boolean
+          nullable: true
+          description: Whether the key may request proof docs. Defaults true.
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        maskedKey:
+          type: string
+          description: Prefix + ellipsis; the full secret is never re-shown.
+        createdAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - active
+          - revoked
+        scopes:
+          type: object
+          properties:
+            freshness:
+              type: array
+              items:
+                type: string
+                enum:
+                - standard
+                - weekly
+                - daily
+            proof:
+              type: boolean
+  responses:
+    Unauthorized:
+      description: Missing or invalid credential.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

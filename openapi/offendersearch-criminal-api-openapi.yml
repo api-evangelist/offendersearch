@@ -1,0 +1,125 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Criminal API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Criminal
+paths:
+  /v1/criminal/search:
+    post:
+      operationId: criminalSearch
+      summary: Search US criminal records — jail, prison, court and warrant
+      description: 'Searches county jail booking rosters, statewide prison systems, court sources and warrant systems across more than a thousand county, state and federal jurisdictions.
+
+
+        ☠ `lastName` is REQUIRED. An unbounded criminal query is refused rather than answered from an arbitrary slice that would differ run to run — a name is the field that cannot be enumerated. Supply `firstName` and a `dob` or `birthYear` wherever you have them; a bare common surname matches thousands of people and the score cannot tell you which is yours.
+
+
+        ☠ READ `recordType` BEFORE CHARACTERISING ANYONE. A jail booking is an ARREST-stage record — charges at booking are frequently reduced, dismissed or never filed, and it is not a conviction. Prison custody implies a sentence. A court record carries the disposition, which is the authoritative statement of how a case ended. A warrant means the person is sought and nothing has been tested.
+
+
+        Not a consumer report — not for FCRA-covered decisions.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - lastName
+              properties:
+                lastName:
+                  type: string
+                  description: REQUIRED. The query must be bounded by a name.
+                firstName:
+                  type: string
+                  description: Given name. Strongly recommended.
+                dob:
+                  type: string
+                  format: date
+                  description: YYYY-MM-DD. The strongest disambiguator.
+                birthYear:
+                  type: integer
+                  description: Birth year, when a full DOB is unknown.
+                age:
+                  type: integer
+                  description: Approximate current age.
+                state:
+                  type: string
+                  description: 2-letter state code, e.g. TX.
+                county:
+                  type: string
+                  description: County name, to narrow within a state.
+                limit:
+                  type: integer
+                  description: Max records returned. Default 50.
+      responses:
+        '200':
+          description: Criminal records matching the bounded query
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  counts:
+                    type: object
+                    description: '`records` is the total found, `recordsReturned` the number in this page. `sourcesIncomplete` above zero means the result is a LOWER BOUND, not an empty answer.
+
+                      '
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      description: 'Carries recordType, externalId, name, aliases, dob / birthYear / dobPrecision, sex, race, state, county, custody status and facility, sentence and parole detail, cases[], sources[] (per-source citation), and matchConfidence / matchBasis explaining why it matched.
+
+                        '
+                  searchId:
+                    type: string
+        '400':
+          description: Unbounded query — a surname is required.
+      tags:
+      - Criminal
+  /v1/criminal/sources:
+    get:
+      operationId: listCriminalSources
+      summary: Coverage catalog for the criminal jurisdictions
+      description: Which criminal-record jurisdictions are reachable, what kind of records each holds (jail / prison / court / warrant / registry), and which are answering today. Depth is uneven by design — counties publish independently, so a state with many county jurisdictions is not "better covered" than one publishing a single statewide source, it is differently structured.
+      responses:
+        '200':
+          description: The criminal jurisdiction roster
+      tags:
+      - Criminal
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

@@ -1,0 +1,85 @@
+openapi: 3.2.0
+info:
+  title: Offendersearch Billing API
+  version: 1.0.0
+  description: National sex-offender search across all US states and territories, unified behind one API.
+servers:
+- url: https://api.offendersearch.app
+security:
+- ApiKeyAuth: []
+tags:
+- name: Billing
+paths:
+  /v1/billing:
+    get:
+      operationId: getBilling
+      summary: Billing state (session)
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Billing state derived from the account + usage.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Billing'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Billing
+components:
+  schemas:
+    Error:
+      type: object
+      description: Standard FastAPI error body.
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message.
+          example: Missing or invalid API key. Send it in the X-API-Key header.
+    Billing:
+      type: object
+      properties:
+        billingEnabled:
+          type: boolean
+        paymentMethod:
+          type: object
+          nullable: true
+        currentSpend:
+          type: number
+        softCap:
+          type: number
+          nullable: true
+        invoices:
+          type: array
+          items:
+            type: object
+  responses:
+    Unauthorized:
+      description: Missing or invalid credential.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Customer API key. Primary auth for search/records/compat/proof.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Signed session token (HMAC-SHA256). Auth for account/dashboard endpoints; also accepted by POST /v1/search and the compat endpoint.
+
+        '
+    QueryKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+      description: API key passed as `?key=` — offenders.io demo mode (compat endpoint only).
+    AdminAuth:
+      type: apiKey
+      in: header
+      name: X-Admin-Key
+      description: Internal admin credential — separate from customer API keys.

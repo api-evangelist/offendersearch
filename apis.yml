@@ -151,6 +151,8 @@ apis:
   humanURL: https://offendersearch.app/docs
   baseURL: https://api.offendersearch.app
   tags:
+  - Authentication
+  tags_raw:
   - Auth
   properties:
   - type: OpenAPI
