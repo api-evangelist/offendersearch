@@ -28,18 +28,166 @@ deployment:
   source: claimed-backlog re-probe 2026-09-11
 tools:
 - name: search_offenders
-  description: Search US sex-offender registries for one person and/or location. Fans out across all 58
-    registries (or the ones named in jurisdictions), de-duplicates people across registries, scores each
-    match, and returns the normalized records.
+  description: "Search US sex-offender registries for one person and/or location.\n\n    Fans out across\
+    \ all 58 registries (or the ones named in `jurisdictions`),\n    de-duplicates people across registries,\
+    \ scores each match, and returns the\n    normalized records. Supply whatever identifiers you have\
+    \ — all args are\n    optional but at least a name, location, or free-text `q` should be given.\n\n\
+    \    Returns a SearchResponse object (docs/openapi.yaml / FIELD-DICTIONARY.md):\n      - status: 'complete'\
+    \ | 'partial'  (partial = a source errored, or a source\n        could not be searched to completion)\n\
+    \      - counts: { records, sourcesQueried, sourcesIncomplete }\n      - warnings: [str] — ALWAYS\
+    \ present, `[]` when the search ran clean\n      - sourceStatus: [ { source, status, matched, fromCache,\
+    \ note,\n        incomplete, incompleteReason } ]  per-registry outcome\n\n    ★ READ `counts.sourcesIncomplete`\
+    \ BEFORE REPORTING A RESULT. Above 0, `records`\n    is a LOWER BOUND: those registries could not\
+    \ be searched to the end, and an\n    empty or short result is NOT evidence that a person is unregistered.\
+    \ Say so.\n    `warnings[0]` states it in plain language; relay it rather than summarising it\n  \
+    \  away.\n      - records: [ Record ], each with:\n          recordId, matchConfidence, matchBasis[],\n\
+    \          name {first, middle, last, suffix, full}, aliases[], nicknames[],\n          dob, dobPrecision,\
+    \ age, sex, race, ethnicity, height, weight,\n          eyeColor, hairColor, marks, addresses[{type,line1,city,county,state,zipcode,lat,lng}],\n\
+    \          offense {crime,statute,riskLevel,tier,convictionDate,...}, flags{absconder,predator},\n\
+    \          source {jurisdiction,registryName,recordUrl,scrapedAt,sourceUpdatedAt}, sources[],\n  \
+    \        dobVerification, unverified\n          (offenses[], stateData, images[] are populated only\
+    \ when extensive=true)\n\n    Auth: uses the caller's X-API-Key (request header or OFFENDERSEARCH_API_KEY\
+    \ env)."
 - name: batch_search
-  description: Up to 1,000 queries in one call, one row in and one row out.
+  description: "Run many person/location lookups in one call (row-in / row-out).\n\n    Each row goes\
+    \ through the SAME engine as search_offenders, so a row's records\n    are identical to what a single\
+    \ search would return. A row that fails is\n    reported with status='error' in place and never aborts\
+    \ the batch. Max 1000 rows.\n\n    Returns: { count, results: [ { index, status, counts{records,sourcesQueried,\n\
+    \    sourcesIncomplete}, warnings: [str], records: [Record], error? } ] } in input\n    order. ★ A\
+    \ row with `counts.sourcesIncomplete > 0` could not be searched to the\n    end — its `records` are\
+    \ a LOWER BOUND, not a clean 'no match'.\n\n    Auth: uses the caller's X-API-Key (request header\
+    \ or OFFENDERSEARCH_API_KEY env)."
 - name: get_registry_coverage
-  description: Public catalog of every US registry covered, with scope, legal status and health. No API
-    key required.
+  description: "List every registry we cover plus its scope, legal status, and health.\n\n    Public coverage\
+    \ catalog (no API key required). Use it to discover the\n    `jurisdictions` codes accepted by search_offenders\
+    \ / batch_search and to\n    check per-registry freshness/health before relying on a result.\n\n \
+    \   Returns: { count, registries: [ SourceInfo ] } where each SourceInfo is:\n      - id: registry\
+    \ code (e.g. 'IL', 'TX', 'PR')\n      - name: human-readable registry name\n      - covers: [state\
+    \ codes] a registry covers ('*' = national / all)\n      - scope: 'state' | 'national'\n      - status:\
+    \ 'live' | 'building'\n      - legal: { commercialUse: 'allowed'|'restricted'|'prohibited'|'unknown'\
+    \ }\n      - health: { lastSuccessAt, typicalLatencyMs, ageSeconds, freshFor }\n\n    `health` is\
+    \ OPERATIONAL COVERAGE METADATA about our ingest schedule, published\n    for transparency. It is\
+    \ NOT a quality warning about a search result: a search\n    serves every registry's best available\
+    \ data regardless of `freshFor`, so a\n    registry listing only 'weekly' still contributes its records\
+    \ to a\n    freshness='daily' search. Do NOT tell a user their search results are stale,\n    unreliable\
+    \ or out of date on the basis of these fields — they are not. The only\n    completeness signal that\
+    \ belongs in an answer is `counts.sourcesIncomplete` /\n    `warnings[]` from the search response\
+    \ itself."
 - name: search_criminal
-  description: Search US criminal records — jail, prison, court and warrant.
+  description: "Search US criminal records — county jail bookings, state prison custody, court cases and\
+    \ warrants.\n\n    Covers county jail rosters, statewide prison systems, court sources, warrant\n\
+    \    systems and statewide registries across the states, DC and the territories,\n    plus the federal\
+    \ layer — which is a separate system holding offences no state\n    search will surface.\n\n    A\
+    \ surname is REQUIRED. Supply firstName and a DOB or birth year wherever you\n    have them: a bare\
+    \ common surname returns thousands of people, and the scoring\n    cannot tell you which one is yours.\n\
+    \n    Each record carries `recordType`, and YOU MUST READ IT BEFORE CHARACTERISING\n    ANYONE:\n\
+    \      - a jail booking is an ARREST-stage record — charges at booking are\n        frequently reduced,\
+    \ dismissed, or never filed. It is NOT a conviction.\n      - prison custody implies a sentence, and\
+    \ therefore a conviction.\n      - a court record carries the DISPOSITION — the authoritative statement\
+    \ of\n        how a case actually ended.\n      - a warrant means the person is SOUGHT. Nothing has\
+    \ been tested.\n    Never describe someone as convicted on the strength of a booking record.\n\n \
+    \   Records also carry: name, aliases, dob/birthYear/dobPrecision, sex, race,\n    state, county,\
+    \ custody status and facility, sentence and parole detail,\n    `cases`, `sources` (per-source citation),\
+    \ and `matchConfidence`/`matchBasis`\n    explaining why it matched. `counts.records` is the total\
+    \ found and\n    `counts.recordsReturned` the number in this page.\n\n    Not a consumer report: results\
+    \ must not be used for FCRA-covered decisions\n    (employment, tenancy, credit) without appropriate\
+    \ process."
 - name: get_criminal_coverage
-  description: Coverage catalog for the criminal jurisdictions.
+  description: "List the criminal-record jurisdictions searched, with kind and status.\n\n    Use it to\
+    \ discover which states and counties are reachable and which are\n    answering today, before relying\
+    \ on an empty result. Depth is uneven by design:\n    counties publish independently, so a state with\
+    \ many county jurisdictions is\n    not \"better covered\" than one that publishes a single statewide\
+    \ source — it is\n    differently structured.\n\n    Returns the jurisdiction roster; each entry carries\
+    \ its code, the state it\n    belongs to, the kind of records it holds (jail / prison / court / warrant\
+    \ /\n    registry) and whether it is currently answering."
+- name: map_viewport
+  description: "Get what to draw for one map view: clusters, pins, or named pins.\n\n    Send the view\
+    \ as `bbox`, or as `lat` + `lng` + `radius_miles`. The detail\n    returned depends on the zoom the\
+    \ view is answered at (the response states it\n    in `zoom`):\n      - zoom 3-12  -> mode 'clusters':\
+    \ a count per grid cell. Each cluster has\n        `count`, `bbox`, `breakdown` and `expansionZoom`\
+    \ (fit the map to `bbox` at\n        that zoom and the cluster comes apart).\n      - zoom 13-14 ->\
+    \ mode 'pins': one pin per address, position only, no name.\n      - zoom 15+   -> mode 'markers':\
+    \ pins with `label` (first initial and last\n        name), `housingStatus`, `hasPhoto`, `registryState`.\n\
+    \    A close view holding more than 300 pins is answered as clusters instead.\n\n    Returns: { mode,\
+    \ zoom, bbox, datasetVersion, total, breakdown {street, housed,\n    homeless, incarcerated}, clusters[],\
+    \ markers[], areas[], unplaced {count,\n    states}, notice }. In radius mode also `center`, `radiusMiles`\
+    \ and\n    `withinRadius` (exact), and each marker has `distanceMiles`.\n      - A marker with `id:\
+    \ null` and a `groupId` stands for several people at one\n        address: call map_group with that\
+    \ `groupId`.\n      - `areas` are people placed only at the middle of a ZIP, city or county;\n   \
+    \     each has a `groupId` too. Never describe them as being at an exact spot.\n      - `unplaced`\
+    \ counts people in the states this view touches who have no\n        mappable address. Mention it\
+    \ rather than implying the map shows everyone.\n      - To see who one marker is, call map_open_record\
+    \ with its `id`.\n\n    A pin shows a REGISTERED ADDRESS, not a person's current location — say so\n\
+    \    when you describe a result (`notice` carries the sentence).\n\n    Billing: one map request per\
+    \ call ($2 per 1,000), whatever the view holds. Marker and group\n    ids work for 24 hours. The Map\
+    \ API must be turned on for the account\n    (the API answers 403 `map_not_enabled` otherwise); `sandbox=true`\
+    \ works\n    without it.\n\n    Auth: uses the caller's X-API-Key (request header or OFFENDERSEARCH_API_KEY\
+    \ env)."
+- name: map_area
+  description: "Get what to draw inside a drawn shape: a polygon, or a line with a buffer.\n\n    The\
+    \ same answer as map_viewport for the shape's bounding box, limited to what\n    is inside the shape,\
+    \ at the same detail levels (clusters, pins, or named pins\n    at zoom 15+). The response adds `shape:\
+    \ 'polygon' | 'route'`.\n\n    Returns: { shape, mode, zoom, bbox, datasetVersion, total, breakdown\
+    \ {street,\n    housed, homeless, incarcerated}, clusters[], markers[], areas[], unplaced\n    {count,\
+    \ states}, notice }.\n      - A marker with `id: null` and a `groupId` stands for several people at\
+    \ one\n        address: call map_group with that `groupId`.\n      - `areas` are people placed only\
+    \ at the middle of a ZIP, city or county.\n        Never describe them as being at an exact spot.\n\
+    \      - To see who one marker is, call map_open_record with its `id`.\n\n    A pin shows a REGISTERED\
+    \ ADDRESS, not a person's current location — say so\n    when you describe a result (`notice` carries\
+    \ the sentence).\n\n    Billing: one map request per call ($2 per 1,000), whatever the shape holds.\n\
+    \    Marker and group ids work for 24 hours. The Map API must be turned on for the\n    account (403\
+    \ `map_not_enabled` otherwise); `sandbox=true` works without it.\n\n    Auth: uses the caller's X-API-Key\
+    \ (request header or OFFENDERSEARCH_API_KEY env)."
+- name: map_route
+  description: "Exact counts of registered addresses along one walking or bus route.\n\n    Counts a corridor\
+    \ either side of the line, a radius around each stop, or\n    both, and returns exact numbers per\
+    \ leg and per stop with nameless pins and\n    their distances. Never an estimate and never partial:\
+    \ the answer is complete\n    or the call fails without a charge.\n\n    Returns: { shape: 'route',\
+    \ profile, measure, detail, datasetVersion, complete,\n    lengthMiles, corridorMiles, stopRadiusFeet,\
+    \ parcelAllowanceFeet, units,\n    total, corridorTotal, stopsTotal, breakdown {street, housed, homeless,\n\
+    \    incarcerated}, legs: [ {leg, fromStop, toStop, lengthMiles, count} ],\n    stops: [ {stopId,\
+    \ alongMiles, count, nearestFeet, markerIds} ],\n    markers: [ {id, lat, lng, precision, addressType,\
+    \ distanceMiles, leg,\n    alongMiles, nearestStop, stopDistanceFeet} ], groups[], approximate {count,\n\
+    \    areas[]}, unplaced {count, states}, externalId, notice, routeNotice }.\n      - `total` = distinct\
+    \ people with a street address in the corridor or a\n        stop's reach; leg counts sum to `corridorTotal`.\n\
+    \      - Pins carry NO NAMES. A `groups` entry (several people at one address) and\n        an `approximate.areas`\
+    \ entry (people placed only at the middle of a ZIP,\n        city or county; never in `total`) open\
+    \ with map_group.\n      - To see who one marker is, call map_open_record with its `id` — a\n    \
+    \    separate charge at the account's record-open rate (published price\n        $0.035 per open;\
+    \ an account's agreed rate may differ). Open only the\n        records the user asks for, not every\
+    \ marker on the route.\n      - More than 300 pins at detail=full is a 422 `route_too_many_people`\
+    \ that\n        carries the exact counts and is not charged: use detail='count' or split\n       \
+    \ the route.\n\n    A count shows REGISTERED ADDRESSES, NOT WHERE ANYONE IS, and is not a rating\n\
+    \    of the route. Never describe a route as safe or unsafe; relay `notice` and\n    `routeNotice`.\
+    \ It supports the user's process; it is not a legal\n    determination.\n\n    Billing: route units,\
+    \ each one map request ($2 per 1,000): one per started\n    mile of measured corridor plus one per\
+    \ 10 stops when stop radii are measured\n    (minimum 1); `units` in the answer says how many. detail='count'\
+    \ costs the\n    same. E.g. a 17.4-mile bus route with 35 stops = 18 + 4 = 22 units. Test\n    mode\
+    \ is free. The Map API must be turned on for the account.\n\n    Auth: uses the caller's X-API-Key\
+    \ (request header or OFFENDERSEARCH_API_KEY env)."
+- name: map_group
+  description: "List the people behind a many-people pin or an approximate-area pin.\n\n    Returns: {\
+    \ total, page, perPage, totalPages, kind: 'address' | 'area', named,\n    members: [ { id, addressType,\
+    \ label, housingStatus, hasPhoto } ] }. Members\n    carry `label` only when the group id came from\
+    \ a view at zoom 15 or closer\n    (`named: true`). Each member `id` opens with map_open_record.\n\
+    \n    Billing: one map request per page. A group id works for 24 hours and only\n    for the account\
+    \ it was issued to; after that, call map_viewport again.\n\n    Auth: uses the caller's X-API-Key\
+    \ (request header or OFFENDERSEARCH_API_KEY env)."
+- name: map_open_record
+  description: "Open the complete record behind one map marker, or behind a saved reference.\n\n    Returns:\
+    \ { record, recordRef, billing: { billed, unit, reason }, notice }.\n    `record` is the same Record\
+    \ object search_offenders returns. `recordRef`\n    ('mr_...') is a lasting reference: keep it to\
+    \ open the same record later,\n    after the marker id has expired.\n\n    Billing: one record open\
+    \ per person per map response, at the account's\n    record-open rate (published price $0.035 per\
+    \ open; an account's agreed rate\n    may differ) — so open a marker only when the user wants that\
+    \ person's\n    record, not every marker in a view or along a route.\n      - The same marker id again\
+    \ is free (`reason: 'marker_already_opened'`).\n      - A new map_viewport, map_area, map_route or\
+    \ map_group answer carries new\n        ids; opening the same person from it is a new charge.\n  \
+    \    - Opening by `recordRef` is one record open, then free for 24 hours. A\n        record just opened\
+    \ from a marker is also free by its reference for 24\n        hours.\n    `billing.billed` says whether\
+    \ THIS open was charged.\n\n    Marker ids work for 24 hours (410 `marker_expired` after that). A\
+    \ 410\n    `record_no_longer_listed` means the registry no longer lists the person; it\n    is not\
+    \ billed.\n\n    Auth: uses the caller's X-API-Key (request header or OFFENDERSEARCH_API_KEY env)."
 tools_schemas: mcp/offendersearch-mcp-tools.json
 tool_quality:
   tool_count: 10
@@ -70,3 +218,4 @@ tool_quality:
   scored: false
   note: Facts from the saved tools/list capture (mcp_tool_quality.py); recorded, not scored. Checks learned
     from Glimind's agent-readiness audit.
+tools_count: 10

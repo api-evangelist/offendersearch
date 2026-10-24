@@ -42,3 +42,36 @@ addons:
     price: 0.02
     currency: USD
     unit: per document (POST /v1/report, within 7 days of the search)
+x-canonical:
+  generated: '2026-10-18'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - negotiated
+  - subscription
+  units: []
+  plans:
+  - name: Free trial
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods: []
+  - name: Per call
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Volume
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Enterprise
+    access: other
+    model: negotiated
+    model_how: derived
+    units: []
+    periods: []
